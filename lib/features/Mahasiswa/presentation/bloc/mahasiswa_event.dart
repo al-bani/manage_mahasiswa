@@ -12,3 +12,11 @@ class GetAllMahasiswaEvent extends MahasiswaEvent {
 
   List<Object?> get props => [];
 }
+
+class GetMahasiswaEvent extends MahasiswaEvent {
+  final int nim;
+
+  GetMahasiswaEvent(this.nim);
+
+  List<Object?> get props => [];
+}

@@ -24,7 +24,22 @@ class MahasiswaRepositoryImpl extends MahasiswaRepository {
 
       return DataSuccess(data);
     } else {
+      return DataFailed(result);
+    }
+  }
 
+  @override
+  Future<DataState<MahasiswaEntity>> getMahasiswa(
+      String token, int adminId, int nim) async {
+    Response response =
+        await _mahasiswaApiService.getDetailMahasiswa(token, adminId, nim);
+    Map<String, dynamic> result = response.data;
+
+    if (result.containsKey('result')) {
+      Map<String, dynamic> dataBody = response.data;
+      MahasiswaModel data = MahasiswaModel.fromJson(dataBody["result"]);
+      return DataSuccess(data);
+    } else {
       return DataFailed(result);
     }
   }

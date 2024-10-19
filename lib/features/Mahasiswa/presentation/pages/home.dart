@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/domain/entities/mahasiswa_entity.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/presentation/bloc/mahasiswa_bloc.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/presentation/bloc/mahasiswa_event.dart';
@@ -67,17 +68,18 @@ Widget _bodyApp() {
 Widget _listMhs() {
   return BlocBuilder<MahasiswaBloc, MahasiswaState>(
     builder: (context, state) {
-      if (state is RemoteMahasiswaLoading && state is! RemoteMahasiswaDone) {
+      if (state is RemoteMahasiswaLoading &&
+          state is! RemoteMahasiswaDoneList) {
         return const Center(child: CircularProgressIndicator());
       } else if (state is RemoteMahasiswaError) {
         return Center(child: Text("Error: ${state.error!["msg"]}"));
-      } else if (state is RemoteMahasiswaDone) {
+      } else if (state is RemoteMahasiswaDoneList) {
         List<MahasiswaEntity>? allMahasiswa = state.mahasiswa;
         if (allMahasiswa.isEmpty) {
           return const Center(child: Text("No data available"));
         }
 
-        ScrollController _scrollController = ScrollController();
+        ScrollController scrollController = ScrollController();
 
         return NotificationListener<ScrollNotification>(
           onNotification: (ScrollNotification scrollInfo) {
@@ -92,16 +94,21 @@ Widget _listMhs() {
             return false;
           },
           child: ListView.builder(
-            controller: _scrollController,
+            controller: scrollController,
             itemCount: allMahasiswa.length + (state.hasMoreData ? 1 : 0),
             itemBuilder: (context, index) {
               if (index == allMahasiswa.length && state.hasMoreData) {
                 return const Center(child: CircularProgressIndicator());
               }
               final mahasiswa = allMahasiswa[index];
-              return ListTile(
-                title: Text(mahasiswa.name ?? 'No Name'),
-                subtitle: Text(mahasiswa.nim.toString()),
+
+              return InkWell(
+                onTap: () => GoRouter.of(context)
+                    .goNamed('detail', extra: mahasiswa.nim),
+                child: ListTile(
+                  title: Text(mahasiswa.name ?? 'No Name'),
+                  subtitle: Text(mahasiswa.nim.toString()),
+                ),
               );
             },
           ),

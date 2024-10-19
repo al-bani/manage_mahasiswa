@@ -135,7 +135,7 @@ class RegisterScreen extends StatelessWidget {
   }
 
   Widget _alignPasswordRequirement() {
-    return Align(
+    return const Align(
       alignment: Alignment.centerLeft,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

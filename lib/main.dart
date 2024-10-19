@@ -8,7 +8,9 @@ import 'package:manage_mahasiswa/observer.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   bool isLoggedIn = await getLoginStatus();
+
   final appRouter = AppRouter(isLoggedIn: isLoggedIn);
 
   await init();
