@@ -43,4 +43,18 @@ class MahasiswaRepositoryImpl extends MahasiswaRepository {
       return DataFailed(result);
     }
   }
+
+  @override
+  Future<DataState<int>> deleteMahasiswa(
+      String token, int adminId, int nim) async {
+    Response response =
+        await _mahasiswaApiService.deleteMahasiswa(token, adminId, nim);
+
+    if (response.statusCode == 200) {
+      return const DataSuccess(200);
+    } else {
+      Map<String, dynamic> result = response.data;
+      return DataFailed(result);
+    }
+  }
 }

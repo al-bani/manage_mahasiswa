@@ -9,15 +9,16 @@ import 'package:manage_mahasiswa/features/Mahasiswa/presentation/pages/update.da
 
 class AppRouter {
   final bool isLoggedIn;
+
   AppRouter({required this.isLoggedIn});
 
-  get router => GoRouter(
+  GoRouter get router => GoRouter(
         initialLocation: isLoggedIn ? '/home' : '/auth/login',
         routes: [
           GoRoute(
             path: '/home',
             name: 'home',
-            pageBuilder: (context, state) => NoTransitionPage(
+            pageBuilder: (context, state) => const NoTransitionPage(
               child: HomeScreen(),
             ),
           ),
@@ -25,9 +26,9 @@ class AppRouter {
             path: '/detail',
             name: 'detail',
             pageBuilder: (context, state) {
-              final int id = state.extra as int; // Ensure you're passing an int
+              final int id = state.extra as int;
               return NoTransitionPage(
-                child: DetailScreen(id), // Pass id to DetailScreen
+                child: DetailScreen(id),
               );
             },
           ),
@@ -46,20 +47,22 @@ class AppRouter {
             ),
           ),
           GoRoute(
-            path: '/auth', // Menghapus slash di akhir path
+            path: '/auth',
             redirect: (context, state) => isLoggedIn ? '/home' : null,
             routes: [
               GoRoute(
                 path: 'login',
                 name: 'login',
-                pageBuilder: (context, state) =>
-                    const NoTransitionPage(child: LoginScreen()),
+                pageBuilder: (context, state) => const NoTransitionPage(
+                  child: LoginScreen(),
+                ),
               ),
               GoRoute(
                 path: 'register',
                 name: 'register',
-                pageBuilder: (context, state) =>
-                    const NoTransitionPage(child: RegisterScreen()),
+                pageBuilder: (context, state) => const NoTransitionPage(
+                  child: RegisterScreen(),
+                ),
               ),
               GoRoute(
                 path: 'verification',

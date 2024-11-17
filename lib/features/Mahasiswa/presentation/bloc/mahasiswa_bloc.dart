@@ -3,6 +3,7 @@ import 'package:manage_mahasiswa/core/resources/data_local.dart';
 import 'package:manage_mahasiswa/core/resources/data_state.dart';
 import 'package:manage_mahasiswa/features/Auth/domain/entities/admin_entity.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/domain/entities/mahasiswa_entity.dart';
+import 'package:manage_mahasiswa/features/Mahasiswa/domain/usecases/delete_mahasiswa.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/domain/usecases/get_mahasiswa_all.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/domain/usecases/get_mahasiswa_detail.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/presentation/bloc/mahasiswa_event.dart';
@@ -13,7 +14,7 @@ class MahasiswaBloc extends Bloc<MahasiswaEvent, MahasiswaState> {
   final GetMahasiswaAllUseCase _getMhsAllUsecase;
   final GetMahasiswaDetailUseCase _getMhsDetailUsecase;
 
-  MahasiswaBloc(this._getMhsAllUsecase, this._getMhsDetailUsecase)
+  MahasiswaBloc(this._getMhsAllUsecase, this._getMhsDetailUsecase, DeleteMahasiswaUseCase deleteMahasiswaUseCase)
       : super(const RemoteMahasiswaInitial()) {
     on<GetAllMahasiswaEvent>(onGetAllMahasiswa);
     on<GetMahasiswaEvent>(onGetMahasiswa);
