@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -8,21 +10,38 @@ import 'package:manage_mahasiswa/features/Mahasiswa/presentation/bloc/mahasiswa_
 import 'package:manage_mahasiswa/injection_container.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  HomeScreen({super.key});
+
+  final scrollController = ScrollController();
+
+  void setupScrollController(BuildContext context) {
+    scrollController.addListener(() {
+      if (scrollController.position.atEdge) {
+        if (scrollController.position.pixels != 0) {
+          context.read<MahasiswaBloc>().add(GetAllMahasiswaEvent(false));
+        }
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: BlocProvider(
         create: (_) => containerInjection<MahasiswaBloc>()
-          ..add(GetAllMahasiswaEvent(true, [])),
-        child: _bodyApp(),
+          ..add(GetAllMahasiswaEvent(true)),
+        child: BlocBuilder<MahasiswaBloc, MahasiswaState>(
+          builder: (context, state) {
+            setupScrollController(context);
+            return _bodyApp(scrollController, state);
+          },
+        ),
       ),
     );
   }
 }
 
-Widget _bodyApp() {
+Widget _bodyApp(ScrollController scrollController, MahasiswaState state) {
   TextEditingController searchController = TextEditingController();
 
   return Container(
@@ -54,67 +73,63 @@ Widget _bodyApp() {
             const SizedBox(width: 10),
             IconButton(
               onPressed: () {},
-              icon: Icon(Icons.search),
+              icon: const Icon(Icons.search),
             ),
           ],
         ),
         const SizedBox(height: 20),
-        Expanded(child: _listMhs()),
+        Expanded(child: _listMhs(scrollController, state)),
       ],
     ),
   );
 }
 
-Widget _listMhs() {
-  return BlocBuilder<MahasiswaBloc, MahasiswaState>(
-    builder: (context, state) {
-      if (state is RemoteMahasiswaLoading &&
-          state is! RemoteMahasiswaDoneList) {
-        return const Center(child: CircularProgressIndicator());
-      } else if (state is RemoteMahasiswaError) {
-        return Center(child: Text("Error: ${state.error!["msg"]}"));
-      } else if (state is RemoteMahasiswaDoneList) {
-        List<MahasiswaEntity>? allMahasiswa = state.mahasiswa;
-        if (allMahasiswa.isEmpty) {
-          return const Center(child: Text("No data available"));
-        }
+Widget _listMhs(ScrollController scrollController, MahasiswaState state) {
+  List<MahasiswaEntity> mahasiswa = [];
+  bool isLoading = false;
+  bool hasMoreData = true;
 
-        ScrollController scrollController = ScrollController();
+  if (state is RemoteMahasiswaGetList) {
+    mahasiswa = state.dataOldmahasiswa;
+    isLoading = true;
+  } else if (state is RemoteMahasiswaDoneList) {
+    mahasiswa = state.mahasiswa;
+    hasMoreData = state.hasMoreData;
+  } else if (state is RemoteMahasiswaError) {
+    return const Text("Something went Error");
+  } else if (hasMoreData) {
+    return const Center(child: CircularProgressIndicator());
+  }
 
-        return NotificationListener<ScrollNotification>(
-          onNotification: (ScrollNotification scrollInfo) {
-            if (scrollInfo.metrics.pixels ==
-                    scrollInfo.metrics.maxScrollExtent &&
-                state.hasMoreData) {
-              context
-                  .read<MahasiswaBloc>()
-                  .add(GetAllMahasiswaEvent(false, allMahasiswa));
-              return true;
-            }
-            return false;
-          },
-          child: ListView.builder(
-            controller: scrollController,
-            itemCount: allMahasiswa.length + (state.hasMoreData ? 1 : 0),
-            itemBuilder: (context, index) {
-              if (index == allMahasiswa.length && state.hasMoreData) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              final mahasiswa = allMahasiswa[index];
-
-              return InkWell(
-                onTap: () => GoRouter.of(context)
-                    .goNamed('detail', extra: mahasiswa.nim),
-                child: ListTile(
-                  title: Text(mahasiswa.name ?? 'No Name'),
-                  subtitle: Text(mahasiswa.nim.toString()),
-                ),
-              );
-            },
-          ),
-        );
+  return ListView.separated(
+    controller: scrollController,
+    itemBuilder: (context, index) {
+      if (index < mahasiswa.length) {
+        return _dataMahasiswa(mahasiswa[index], context);
+      } else {
+        Timer(const Duration(milliseconds: 30), () {
+          scrollController.animateTo(
+            scrollController.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOut,
+          );
+        });
+        return const SizedBox();
       }
-      return const Center(child: Text("No Data"));
     },
+    separatorBuilder: (context, index) {
+      return const SizedBox();
+    },
+    itemCount: mahasiswa.length + (isLoading && hasMoreData ? 1 : 0),
+  );
+}
+
+Widget _dataMahasiswa(mahasiswa, BuildContext context) {
+  return InkWell(
+    onTap: () => GoRouter.of(context).goNamed('detail', extra: mahasiswa.nim),
+    child: ListTile(
+      title: Text(mahasiswa.name ?? 'No Name'),
+      subtitle: Text(mahasiswa.nim.toString()),
+    ),
   );
 }

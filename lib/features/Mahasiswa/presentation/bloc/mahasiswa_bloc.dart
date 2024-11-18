@@ -10,44 +10,43 @@ import 'package:manage_mahasiswa/features/Mahasiswa/presentation/bloc/mahasiswa_
 import 'package:manage_mahasiswa/features/Mahasiswa/presentation/bloc/mahasiswa_state.dart';
 
 class MahasiswaBloc extends Bloc<MahasiswaEvent, MahasiswaState> {
-  int perPage = 25;
   final GetMahasiswaAllUseCase _getMhsAllUsecase;
   final GetMahasiswaDetailUseCase _getMhsDetailUsecase;
 
-  MahasiswaBloc(this._getMhsAllUsecase, this._getMhsDetailUsecase, DeleteMahasiswaUseCase deleteMahasiswaUseCase)
+  MahasiswaBloc(this._getMhsAllUsecase, this._getMhsDetailUsecase,
+      DeleteMahasiswaUseCase deleteMahasiswaUseCase)
       : super(const RemoteMahasiswaInitial()) {
     on<GetAllMahasiswaEvent>(onGetAllMahasiswa);
     on<GetMahasiswaEvent>(onGetMahasiswa);
   }
 
+  int page = 1;
   void onGetAllMahasiswa(
       GetAllMahasiswaEvent event, Emitter<MahasiswaState> emit) async {
-    List<MahasiswaEntity> existingData = [];
+    if (state is RemoteMahasiswaGetList) return;
+    final currentState = state;
 
-    // Simpan data mahasiswa sebelumnya jika state sudah memuat data
-    if (state is RemoteMahasiswaDoneList) {
-      existingData = (state as RemoteMahasiswaDoneList).mahasiswa;
+    var dataMhsOld = <MahasiswaEntity>[];
+    if (currentState is RemoteMahasiswaDoneList) {
+      dataMhsOld = currentState.mahasiswa;
     }
 
-    // Jangan emit data dengan hasMoreData: true sebelum cek data baru
-    emit(const RemoteMahasiswaLoading());
+    emit(RemoteMahasiswaGetList(
+        dataOldmahasiswa: dataMhsOld, isFirstFetch: page == 1));
 
     AdminEntity? data = await getAdminData();
 
-    // Mendapatkan data baru dari server
     final dataState = await _getMhsAllUsecase.execute(
         data!.token!, data.id!, event.isFirstPage);
 
     if (dataState is DataFailed) {
       emit(RemoteMahasiswaError(dataState.error!));
     } else if (dataState is DataSuccess) {
-      List<MahasiswaEntity> updatedData = existingData + dataState.data!;
+      final mahasiswa = (state as RemoteMahasiswaGetList).dataOldmahasiswa;
+      mahasiswa.addAll(dataState.data!);
+      final hasMoreData = dataState.data!.isNotEmpty;
 
-      // Emit data baru, pastikan hanya menambah ketika ada data baru
-      emit(RemoteMahasiswaDoneList(
-        mahasiswa: updatedData,
-        hasMoreData: dataState.data!.length == perPage,
-      ));
+      emit(RemoteMahasiswaDoneList(mahasiswa: mahasiswa, hasMoreData: hasMoreData));
     }
   }
 

@@ -15,6 +15,7 @@ class MahasiswaRepositoryImpl extends MahasiswaRepository {
       String token, int adminId, bool isFirstPage) async {
     Response response =
         await _mahasiswaApiService.getAllMahasiswa(token, adminId, isFirstPage);
+
     Map<String, dynamic> result = response.data;
 
     if (result.containsKey('result')) {

@@ -23,7 +23,8 @@ class MahasiswaApiServiceImpl extends MahasiswaApiService {
       var response = await dio.post(url, data: queryParams);
       return response;
     } on DioException catch (e) {
-      return e.response!.data;
+      return e.response!;
+ 
     }
   }
 

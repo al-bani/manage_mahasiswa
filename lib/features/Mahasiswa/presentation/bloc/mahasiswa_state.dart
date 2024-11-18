@@ -18,17 +18,22 @@ class RemoteMahasiswaLoading extends MahasiswaState {
   const RemoteMahasiswaLoading();
 }
 
+class RemoteMahasiswaGetList extends MahasiswaState {
+  final List<MahasiswaEntity> dataOldmahasiswa;
+  final bool isFirstFetch;
+
+  const RemoteMahasiswaGetList({
+    required this.dataOldmahasiswa,
+    this.isFirstFetch = false,
+  });
+}
+
 class RemoteMahasiswaDoneList extends MahasiswaState {
   final List<MahasiswaEntity> mahasiswa;
   final bool hasMoreData;
 
-  const RemoteMahasiswaDoneList({
-    required this.mahasiswa,
-    required this.hasMoreData,
-  });
-
-  @override
-  List<Object?> get props => [mahasiswa, hasMoreData];
+  const RemoteMahasiswaDoneList(
+      {required this.mahasiswa, required this.hasMoreData});
 }
 
 class RemoteMahasiswaDone extends MahasiswaState {
