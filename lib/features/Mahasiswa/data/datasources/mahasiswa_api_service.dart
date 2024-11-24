@@ -24,7 +24,6 @@ class MahasiswaApiServiceImpl extends MahasiswaApiService {
       return response;
     } on DioException catch (e) {
       return e.response!;
- 
     }
   }
 
@@ -55,9 +54,10 @@ class MahasiswaApiServiceImpl extends MahasiswaApiService {
 
     try {
       var response = await dio.delete(url, data: queryParams);
+
       return response;
     } on DioException catch (e) {
-      return e.response!.data;
+      return e.response!;
     }
   }
 }

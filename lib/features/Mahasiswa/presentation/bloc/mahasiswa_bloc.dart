@@ -12,12 +12,14 @@ import 'package:manage_mahasiswa/features/Mahasiswa/presentation/bloc/mahasiswa_
 class MahasiswaBloc extends Bloc<MahasiswaEvent, MahasiswaState> {
   final GetMahasiswaAllUseCase _getMhsAllUsecase;
   final GetMahasiswaDetailUseCase _getMhsDetailUsecase;
+  final DeleteMahasiswaUseCase _deleteMahasiswaUseCase;
 
   MahasiswaBloc(this._getMhsAllUsecase, this._getMhsDetailUsecase,
-      DeleteMahasiswaUseCase deleteMahasiswaUseCase)
+      this._deleteMahasiswaUseCase)
       : super(const RemoteMahasiswaInitial()) {
     on<GetAllMahasiswaEvent>(onGetAllMahasiswa);
     on<GetMahasiswaEvent>(onGetMahasiswa);
+    on<DeleteMahasiswaEvent>(onDeleteMahasiswa);
   }
 
   int page = 1;
@@ -46,7 +48,8 @@ class MahasiswaBloc extends Bloc<MahasiswaEvent, MahasiswaState> {
       mahasiswa.addAll(dataState.data!);
       final hasMoreData = dataState.data!.isNotEmpty;
 
-      emit(RemoteMahasiswaDoneList(mahasiswa: mahasiswa, hasMoreData: hasMoreData));
+      emit(RemoteMahasiswaDoneList(
+          mahasiswa: mahasiswa, hasMoreData: hasMoreData));
     }
   }
 
@@ -62,6 +65,19 @@ class MahasiswaBloc extends Bloc<MahasiswaEvent, MahasiswaState> {
       emit(RemoteMahasiswaError(dataState.error!));
     } else {
       emit(RemoteMahasiswaDone(mahasiswa: dataState.data!));
+    }
+  }
+
+  void onDeleteMahasiswa(
+      DeleteMahasiswaEvent event, Emitter<MahasiswaState> emit) async {
+    AdminEntity? data = await getAdminData();
+    final dataState = await _deleteMahasiswaUseCase.execute(
+        data!.token!, data.id!, event.nim);
+
+    if (dataState is DataSuccess) {
+      emit(const RemoteMahasiswaDelete(status: true));
+    } else if (dataState is DataFailed) {
+      emit(const RemoteMahasiswaDelete(status: false));
     }
   }
 }

@@ -15,3 +15,9 @@ class GetMahasiswaEvent extends MahasiswaEvent {
 
   List<Object?> get props => [];
 }
+
+class DeleteMahasiswaEvent extends MahasiswaEvent {
+  final int nim;
+
+  DeleteMahasiswaEvent(this.nim);
+}

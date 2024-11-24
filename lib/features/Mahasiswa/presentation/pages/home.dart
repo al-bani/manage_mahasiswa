@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -33,7 +32,7 @@ class HomeScreen extends StatelessWidget {
         child: BlocBuilder<MahasiswaBloc, MahasiswaState>(
           builder: (context, state) {
             setupScrollController(context);
-            return _bodyApp(scrollController, state);
+            return _bodyApp(scrollController, state, context);
           },
         ),
       ),
@@ -41,7 +40,8 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-Widget _bodyApp(ScrollController scrollController, MahasiswaState state) {
+Widget _bodyApp(
+    ScrollController scrollController, MahasiswaState state, context) {
   TextEditingController searchController = TextEditingController();
 
   return Container(
@@ -50,30 +50,31 @@ Widget _bodyApp(ScrollController scrollController, MahasiswaState state) {
       children: [
         Row(
           children: [
+            IconButton(
+              onPressed: () {},
+              icon: const Icon(Icons.filter_list_outlined),
+            ),
+            const SizedBox(width: 10),
             Expanded(
-              child: TextField(
-                controller: searchController,
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontSize: 16,
-                ),
-                decoration: const InputDecoration(
-                  border: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black, width: 2),
-                  ),
-                  labelText: "Search",
-                  labelStyle: TextStyle(
-                    color: Colors.black,
-                    fontSize: 16,
-                    fontStyle: FontStyle.italic,
-                  ),
+              child: SizedBox(
+                height: 40,
+                child: SearchBar(
+                  onTap: () => GoRouter.of(context).goNamed('search'),
+                  controller: searchController,
+                  elevation: WidgetStateProperty.all(0), // Hilangkan bayangan
+                  trailing: <Widget>[
+                    IconButton(
+                      icon: const Icon(Icons.search),
+                      onPressed: () {},
+                    ),
+                  ],
                 ),
               ),
             ),
             const SizedBox(width: 10),
             IconButton(
               onPressed: () {},
-              icon: const Icon(Icons.search),
+              icon: const Icon(Icons.add),
             ),
           ],
         ),

@@ -53,3 +53,14 @@ class RemoteMahasiswaError extends MahasiswaState {
   @override
   List<Object?> get props => [error];
 }
+
+class RemoteMahasiswaDelete extends MahasiswaState {
+  final bool status;
+
+  const RemoteMahasiswaDelete({
+    required this.status,
+  });
+
+  @override
+  List<Object?> get props => [status];
+}

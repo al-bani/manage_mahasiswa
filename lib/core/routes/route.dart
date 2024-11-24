@@ -5,6 +5,7 @@ import 'package:manage_mahasiswa/features/Auth/presentation/pages/verification.d
 import 'package:manage_mahasiswa/features/Mahasiswa/presentation/pages/create.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/presentation/pages/detail.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/presentation/pages/home.dart';
+import 'package:manage_mahasiswa/features/Mahasiswa/presentation/pages/search.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/presentation/pages/update.dart';
 
 class AppRouter {
@@ -20,6 +21,13 @@ class AppRouter {
             name: 'home',
             pageBuilder: (context, state) => NoTransitionPage(
               child: HomeScreen(),
+            ),
+          ),
+          GoRoute(
+            path: '/search',
+            name: 'search',
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: SearchScreen(),
             ),
           ),
           GoRoute(
