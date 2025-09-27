@@ -51,7 +51,7 @@ _appBody(context) {
               "Login",
               style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
             TextFormField(
               controller: username,
               style: const TextStyle(
@@ -70,9 +70,9 @@ _appBody(context) {
                 ),
               ),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             PasswordField(passwordValue: password, text: "Password"),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             isBtnLoading
                 ? const CircularProgressIndicator()
                 : ElevatedButton(
@@ -99,12 +99,12 @@ _appBody(context) {
                       ),
                     ),
                   ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Align(
               alignment: Alignment.centerLeft,
               child: InkWell(
                 onTap: () => GoRouter.of(context).goNamed('register'),
-                child: Txt(
+                child: const Txt(
                     value: "Don't have an account? register here",
                     size: 14,
                     align: TextAlign.center),

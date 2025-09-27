@@ -118,7 +118,8 @@ Widget _bodyApp() {
                         ),
                         const SizedBox(width: 10),
                         ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () => GoRouter.of(context)
+                              .goNamed('update', extra: mhs.nim!),
                           style: BtnStyle,
                           child: const Text("Update"),
                         ),

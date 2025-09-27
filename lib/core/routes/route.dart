@@ -20,7 +20,7 @@ class AppRouter {
             path: '/home',
             name: 'home',
             pageBuilder: (context, state) => NoTransitionPage(
-              child: HomeScreen(),
+              child: HomeScreen((state.extra as String?) ?? ''),
             ),
           ),
           GoRoute(
@@ -43,9 +43,12 @@ class AppRouter {
           GoRoute(
             path: '/update',
             name: 'update',
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: UpdateScreen(),
-            ),
+            pageBuilder: (context, state) {
+              final int id = state.extra as int;
+              return NoTransitionPage(
+                child: UpdateScreen(id),
+              );
+            },
           ),
           GoRoute(
             path: '/create',

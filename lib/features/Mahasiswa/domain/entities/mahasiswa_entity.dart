@@ -7,6 +7,7 @@ class MahasiswaEntity extends Equatable {
   final String? email;
   final String? phoneNumber;
   final String? fakultas;
+  final String? jurusan;
   final String? dateOfBirth;
   final String? gender;
   final String? image;
@@ -18,6 +19,7 @@ class MahasiswaEntity extends Equatable {
     this.email,
     this.phoneNumber,
     this.fakultas,
+    this.jurusan,
     this.dateOfBirth,
     this.gender,
     this.image,
@@ -32,6 +34,7 @@ class MahasiswaEntity extends Equatable {
       email,
       phoneNumber,
       fakultas,
+      jurusan,
       dateOfBirth,
       gender,
       image,

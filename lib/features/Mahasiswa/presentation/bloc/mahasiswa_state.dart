@@ -3,8 +3,9 @@ import 'package:manage_mahasiswa/features/Mahasiswa/domain/entities/mahasiswa_en
 
 abstract class MahasiswaState extends Equatable {
   final Map<String, dynamic>? error;
+  final MahasiswaEntity? mhs;
 
-  const MahasiswaState({this.error});
+  const MahasiswaState({this.error, this.mhs});
 
   @override
   List<Object?> get props => [];
@@ -26,6 +27,12 @@ class RemoteMahasiswaGetList extends MahasiswaState {
     required this.dataOldmahasiswa,
     this.isFirstFetch = false,
   });
+}
+
+class RemoteSearchMahasiswaGetList extends MahasiswaState {
+  final List<MahasiswaEntity> mahasiswa;
+
+  const RemoteSearchMahasiswaGetList({required this.mahasiswa});
 }
 
 class RemoteMahasiswaDoneList extends MahasiswaState {
@@ -63,4 +70,18 @@ class RemoteMahasiswaDelete extends MahasiswaState {
 
   @override
   List<Object?> get props => [status];
+}
+
+class RemoteMahasiswaCreate extends MahasiswaState {
+  const RemoteMahasiswaCreate(MahasiswaEntity mhs) : super(mhs: mhs);
+
+  @override
+  List<Object?> get props => [mhs];
+}
+
+class RemoteMahasiswaUpdate extends MahasiswaState {
+  const RemoteMahasiswaUpdate(MahasiswaEntity mhs) : super(mhs: mhs);
+
+  @override
+  List<Object?> get props => [mhs];
 }

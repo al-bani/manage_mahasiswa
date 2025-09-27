@@ -8,10 +8,17 @@ import 'package:manage_mahasiswa/features/Mahasiswa/presentation/bloc/mahasiswa_
 import 'package:manage_mahasiswa/features/Mahasiswa/presentation/bloc/mahasiswa_state.dart';
 import 'package:manage_mahasiswa/injection_container.dart';
 
-class HomeScreen extends StatelessWidget {
-  HomeScreen({super.key});
+class HomeScreen extends StatefulWidget {
+  final String search;
+  const HomeScreen(this.search, {super.key});
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   final scrollController = ScrollController();
+  bool searchMode = false;
 
   void setupScrollController(BuildContext context) {
     scrollController.addListener(() {
@@ -23,16 +30,32 @@ class HomeScreen extends StatelessWidget {
     });
   }
 
+  void setSearchMode(bool value) {
+    setState(() {
+      searchMode = value;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final bloc = containerInjection<MahasiswaBloc>();
+
     return Scaffold(
       body: BlocProvider(
-        create: (_) => containerInjection<MahasiswaBloc>()
-          ..add(GetAllMahasiswaEvent(true)),
+        create: (_) {
+          if (widget.search.isNotEmpty) {
+            searchMode = true;
+            bloc.add(SearchMahasiswaEvent(widget.search));
+          } else {
+            bloc.add(GetAllMahasiswaEvent(true));
+          }
+          return bloc;
+        },
         child: BlocBuilder<MahasiswaBloc, MahasiswaState>(
           builder: (context, state) {
             setupScrollController(context);
-            return _bodyApp(scrollController, state, context);
+            return _bodyApp(scrollController, state, context, searchMode, bloc,
+                setSearchMode);
           },
         ),
       ),
@@ -40,8 +63,8 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-Widget _bodyApp(
-    ScrollController scrollController, MahasiswaState state, context) {
+Widget _bodyApp(ScrollController scrollController, MahasiswaState state,
+    context, bool searchMode, bloc, Function(bool) setSearchMode) {
   TextEditingController searchController = TextEditingController();
 
   return Container(
@@ -61,31 +84,41 @@ Widget _bodyApp(
                 child: SearchBar(
                   onTap: () => GoRouter.of(context).goNamed('search'),
                   controller: searchController,
-                  elevation: WidgetStateProperty.all(0), // Hilangkan bayangan
+                  elevation: WidgetStateProperty.all(0),
                   trailing: <Widget>[
-                    IconButton(
-                      icon: const Icon(Icons.search),
-                      onPressed: () {},
-                    ),
+                    searchMode
+                        ? IconButton(
+                            icon: const Icon(Icons.close),
+                            onPressed: () {
+                              bloc.add(GetAllMahasiswaEvent(true));
+                              setSearchMode(false);
+                            },
+                          )
+                        : IconButton(
+                            icon: const Icon(Icons.search),
+                            onPressed: () =>
+                                GoRouter.of(context).goNamed('search'),
+                          ),
                   ],
                 ),
               ),
             ),
             const SizedBox(width: 10),
             IconButton(
-              onPressed: () {},
+              onPressed: () => GoRouter.of(context).goNamed('create'),
               icon: const Icon(Icons.add),
             ),
           ],
         ),
         const SizedBox(height: 20),
-        Expanded(child: _listMhs(scrollController, state)),
+        Expanded(child: _listMhs(scrollController, state, searchMode)),
       ],
     ),
   );
 }
 
-Widget _listMhs(ScrollController scrollController, MahasiswaState state) {
+Widget _listMhs(
+    ScrollController scrollController, MahasiswaState state, searchMode) {
   List<MahasiswaEntity> mahasiswa = [];
   bool isLoading = false;
   bool hasMoreData = true;
@@ -93,11 +126,13 @@ Widget _listMhs(ScrollController scrollController, MahasiswaState state) {
   if (state is RemoteMahasiswaGetList) {
     mahasiswa = state.dataOldmahasiswa;
     isLoading = true;
+  } else if (state is RemoteSearchMahasiswaGetList) {
+    mahasiswa = state.mahasiswa;
   } else if (state is RemoteMahasiswaDoneList) {
     mahasiswa = state.mahasiswa;
     hasMoreData = state.hasMoreData;
   } else if (state is RemoteMahasiswaError) {
-    return const Text("Something went Error");
+    return Text(state.error!["msg"]);
   } else if (hasMoreData) {
     return const Center(child: CircularProgressIndicator());
   }

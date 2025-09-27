@@ -7,4 +7,10 @@ abstract class MahasiswaRepository {
   Future<DataState<MahasiswaEntity>> getMahasiswa(
       String token, int adminId, int nim);
   Future<DataState<int>> deleteMahasiswa(String token, int adminId, int nim);
+  Future<DataState<MahasiswaEntity>> createMahasiswa(
+      MahasiswaEntity mhs, int adminId, String token);
+  Future<DataState<MahasiswaEntity>> updateMahasiswa(
+      MahasiswaEntity mhs, String token, int adminId, int nim);
+  Future<DataState<List<MahasiswaEntity>>> searchMahasiswa(
+      String token, int adminId, String search);
 }

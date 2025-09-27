@@ -10,70 +10,91 @@ class AdminRepositoryImpl extends AdminRepository {
 
   @override
   Future<DataState<AdminEntity>> login(String username, String password) async {
-    var response = await _adminApiService.login(username, password);
-    Map<String, dynamic> result = response.data;
-
-    if (result.containsKey('result')) {
-      AdminModel data = AdminModel.fromJson(result['result']);
-      return DataSuccess(data);
-    } else {
-      return DataFailed(result);
+    final response = await _adminApiService.login(username, password);
+    if (response == null) {
+      return const DataFailed({"msg": "Tidak ada respons dari server"});
     }
+
+    final Map<String, dynamic> result =
+        (response.data is Map<String, dynamic>) ? response.data : {};
+
+    if (response.statusCode == 200 && result.containsKey('result')) {
+      final AdminModel data = AdminModel.fromJson(result['result']);
+      return DataSuccess(data);
+    }
+
+    return DataFailed(result.isNotEmpty ? result : {"msg": "Login gagal"});
   }
 
   @override
   Future<DataState<AdminEntity>> register(AdminEntity data) async {
-    var response = await _adminApiService.register(data);
-    Map<String, dynamic> result = response.data;
-    if (result.containsKey('result')) {
-      AdminModel data = AdminModel.fromJson(result['result']);
-      return DataSuccess(data);
-    } else {
-      return DataFailed(result);
+    final response = await _adminApiService.register(data);
+    if (response == null) {
+      return const DataFailed({"msg": "Tidak ada respons dari server"});
     }
+
+    final Map<String, dynamic> result =
+        (response.data is Map<String, dynamic>) ? response.data : {};
+
+    if (response.statusCode == 200 && result.containsKey('result')) {
+      final AdminModel admin = AdminModel.fromJson(result['result']);
+      return DataSuccess(admin);
+    }
+
+    return DataFailed(result.isNotEmpty ? result : {"msg": "Register gagal"});
   }
 
   @override
   Future<DataState<String>> sendOTP(String email) async {
-    var response = await _adminApiService.sendOTP(email);
-    Map<String, dynamic> result = response!.data;
-    String message = result["msg"];
-
-    if (response.statusCode == 200) {
-      return DataSuccess(message);
-    } else if (response.statusCode == 400) {
-      return DataFailed(result);
-    } else {
-      return DataFailed(result);
+    final response = await _adminApiService.sendOTP(email);
+    if (response == null) {
+      return const DataFailed({"msg": "Tidak ada respons dari server"});
     }
+
+    final Map<String, dynamic> result =
+        (response.data is Map<String, dynamic>) ? response.data : {};
+    final String message = (result["msg"] ?? "").toString();
+
+    if (response.statusCode == 200 && message.isNotEmpty) {
+      return DataSuccess(message);
+    }
+
+    return DataFailed(
+        result.isNotEmpty ? result : {"msg": "Gagal mengirim OTP"});
   }
 
   @override
   Future<DataState<Map<String, dynamic>>> resendOTP(String email) async {
-    var response = await _adminApiService.resendOTP(email);
-    Map<String, dynamic> result = response!.data;
+    final response = await _adminApiService.resendOTP(email);
+    if (response == null) {
+      return const DataFailed({"msg": "Tidak ada respons dari server"});
+    }
+
+    final Map<String, dynamic> result =
+        (response.data is Map<String, dynamic>) ? response.data : {};
 
     if (response.statusCode == 200) {
       return DataSuccess(result);
-    } else if (response.statusCode == 400) {
-      return DataFailed(result);
-    } else {
-      return DataFailed(result);
     }
+
+    return DataFailed(result.isNotEmpty ? result : {"msg": "Gagal resend OTP"});
   }
 
   @override
-  Future<DataState<Map<String, dynamic>>> verifyOTP(
-      String email, int otpInput) async {
-    var response = await _adminApiService.verifyOTP(email, otpInput);
-    Map<String, dynamic> result = response!.data;
+  Future<DataState<Map<String, dynamic>>> verifyOTP(String email, int otpInput) async {
+    final response = await _adminApiService.verifyOTP(email, otpInput);
+    if (response == null) {
+      return const DataFailed({"msg": "Tidak ada respons dari server"});
+    }
+
+    final Map<String, dynamic> result =
+        (response.data is Map<String, dynamic>) ? response.data : {};
 
     if (response.statusCode == 200) {
       return DataSuccess(result);
-    } else if (response.statusCode == 400) {
-      return DataFailed(result);
-    } else {
-      return DataFailed(result);
     }
+
+    return DataFailed(
+        result.isNotEmpty ? result : {"msg": "Verifikasi OTP gagal"});
   }
 }

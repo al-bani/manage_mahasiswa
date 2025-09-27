@@ -46,31 +46,31 @@ class RegisterScreen extends StatelessWidget {
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
         return Container(
-          margin: EdgeInsets.all(30),
+          margin: const EdgeInsets.all(30),
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
+                const Text(
                   "Register",
                   style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 NormalFiled(text: "Email", controller: emailController),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 NormalFiled(text: "Username", controller: usernameController),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 PasswordField(
                     passwordValue: passwordController, text: "Password"),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 PasswordField(
                     passwordValue: confirmPasswordController,
                     text: "Confirm Password"),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 _alignPasswordRequirement(),
-                SizedBox(height: 30),
+                const SizedBox(height: 30),
                 state is RemoteAuthLoading
-                    ? CircularProgressIndicator()
+                    ? const CircularProgressIndicator()
                     : ElevatedButton(
                         onPressed: () => _onRegisterPressed(
                             context,
@@ -78,18 +78,18 @@ class RegisterScreen extends StatelessWidget {
                             usernameController.text,
                             passwordController.text,
                             confirmPasswordController.text),
-                        child: Text(
+                        style: BtnStyle,
+                        child: const Text(
                           "Register",
                           style: TextStyle(color: Colors.white),
                         ),
-                        style: BtnStyle,
                       ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Align(
                   alignment: Alignment.centerLeft,
                   child: InkWell(
                     onTap: () => GoRouter.of(context).goNamed('login'),
-                    child: Text(
+                    child: const Text(
                       "already have an account, Login now",
                       style: TextStyle(fontSize: 12),
                     ),

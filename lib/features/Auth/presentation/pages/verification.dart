@@ -85,7 +85,7 @@ Widget _appbody(String email, context) {
           _pinput(otpController),
           const SizedBox(height: 70),
           isBtnLoading
-              ? CircularProgressIndicator()
+              ? const CircularProgressIndicator()
               : SizedBox(
                   width: double.infinity,
                   child: Builder(
@@ -97,7 +97,7 @@ Widget _appbody(String email, context) {
                               .add(VerifyOTPEvent(email, otp));
                         },
                         style: BtnStyle,
-                        child: Txt(
+                        child: const Txt(
                           value: "Verify",
                           size: 16,
                           align: TextAlign.center,
@@ -106,7 +106,7 @@ Widget _appbody(String email, context) {
                     },
                   ),
                 ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Align(
             alignment: Alignment.centerLeft,
             child: StreamBuilder<int>(
@@ -131,7 +131,7 @@ Widget _appbody(String email, context) {
                   );
                 } else {
                   return Text("Resend code in ${snapshot.data}",
-                      style: TextStyle(fontSize: 12),
+                      style: const TextStyle(fontSize: 12),
                       textAlign: TextAlign.center);
                 }
               },
@@ -159,7 +159,7 @@ void _dialogPopUpSuccess(context) {
         size: 18,
         align: TextAlign.left,
       ),
-      content: Txt(
+      content: const Txt(
         value: "Verification Success, Login now",
         size: 14,
         align: TextAlign.left,
