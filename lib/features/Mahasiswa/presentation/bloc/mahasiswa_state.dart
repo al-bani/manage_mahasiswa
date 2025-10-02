@@ -27,18 +27,27 @@ class RemoteMahasiswaGetList extends MahasiswaState {
     required this.dataOldmahasiswa,
     this.isFirstFetch = false,
   });
+
+  @override
+  List<Object?> get props => [dataOldmahasiswa, isFirstFetch];
 }
 
 class RemoteSearchMahasiswaGetList extends MahasiswaState {
   final List<MahasiswaEntity> mahasiswa;
 
   const RemoteSearchMahasiswaGetList({required this.mahasiswa});
+
+  @override
+  List<Object?> get props => [mahasiswa];
 }
 
 class RemoteMahasiswaFilterGetList extends MahasiswaState {
   final List<MahasiswaEntity> mahasiswa;
 
   const RemoteMahasiswaFilterGetList({required this.mahasiswa});
+
+  @override
+  List<Object?> get props => [mahasiswa];
 }
 
 class RemoteMahasiswaDoneList extends MahasiswaState {
@@ -47,6 +56,9 @@ class RemoteMahasiswaDoneList extends MahasiswaState {
 
   const RemoteMahasiswaDoneList(
       {required this.mahasiswa, required this.hasMoreData});
+
+  @override
+  List<Object?> get props => [mahasiswa, hasMoreData];
 }
 
 class RemoteMahasiswaDone extends MahasiswaState {

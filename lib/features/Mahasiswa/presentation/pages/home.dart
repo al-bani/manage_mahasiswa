@@ -22,14 +22,58 @@ class _HomeScreenState extends State<HomeScreen> {
   bool searchMode = false;
   bool filterMode = false;
   Map<String, dynamic> filter = {};
+  late final MahasiswaBloc bloc;
+  // State pilihan filter yang dipersist
+  Map<String, bool> facultyOptions = const {
+    "Ekonomi": false,
+    "Teknik": false,
+    "Kedokteran": false,
+    "Hukum": false,
+    "Ilmu Komunikasi": false,
+    "Sastra": false,
+    "teknik": false,
+    "Ilmu Sosial": false,
+  };
+  Map<String, bool> majorOptions = const {
+    "Antropologi": false,
+    "Mesin": false,
+    "Industri": false,
+    "Farmasi": false,
+    "informatika": false,
+    "Public Relations": false,
+    "Kedokteran Umum": false,
+    "Bahasa Prancis": false,
+    "Informatika": false,
+    "Sosiologi": false,
+    "Akuntansi": false,
+    "Elektro": false,
+    "Bisnis": false,
+    "Sipil": false,
+    "Jurnalistik": false,
+    "Ilmu Hukum": false,
+    "Kedokteran Gigi": false,
+    "Manajemen": false,
+    "Bahasa Inggris": false,
+    "Kimia": false,
+  };
+  Map<String, bool> cityOptions = const {
+    "Jakarta": false,
+    "Bandung": false,
+    "Surabaya": false,
+    "Yogyakarta": false,
+    "Medan": false,
+    "Semarang": false,
+    "Makassar": false,
+  };
+  String selectedOrder = "A-Z (NIM)";
+  bool orderSwitch = false;
 
-  void setupScrollController(BuildContext context) {
+  void setupScrollController() {
     scrollController.addListener(() {
       if (scrollController.position.atEdge) {
         if (scrollController.position.pixels != 0) {
-          // Hanya load more data jika tidak dalam mode search atau filter
           if (!searchMode && !filterMode) {
-            context.read<MahasiswaBloc>().add(GetAllMahasiswaEvent(false));
+            bloc.add(GetAllMahasiswaEvent(false));
           }
         }
       }
@@ -50,29 +94,36 @@ class _HomeScreenState extends State<HomeScreen> {
       Navigator.pop(context);
     });
 
-    print(newFilter);
-
     bloc.add(FilterMahasiswaEvent(newFilter));
   }
 
   @override
-  Widget build(BuildContext context) {
-    final bloc = containerInjection<MahasiswaBloc>();
+  void initState() {
+    super.initState();
+    bloc = containerInjection<MahasiswaBloc>();
+    if (widget.search.isNotEmpty) {
+      searchMode = true;
+      bloc.add(SearchMahasiswaEvent(widget.search));
+    } else {
+      bloc.add(GetAllMahasiswaEvent(true));
+    }
+    setupScrollController();
+  }
 
+  @override
+  void dispose() {
+    scrollController.dispose();
+    bloc.close();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocProvider(
-        create: (_) {
-          if (widget.search.isNotEmpty) {
-            searchMode = true;
-            bloc.add(SearchMahasiswaEvent(widget.search));
-          } else {
-            bloc.add(GetAllMahasiswaEvent(true));
-          }
-          return bloc;
-        },
+      body: BlocProvider.value(
+        value: bloc,
         child: BlocBuilder<MahasiswaBloc, MahasiswaState>(
           builder: (context, state) {
-            setupScrollController(context);
             return _bodyApp(scrollController, state, context, searchMode, bloc,
                 setSearchMode);
           },
@@ -107,18 +158,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     controller: searchController,
                     elevation: WidgetStateProperty.all(0),
                     trailing: <Widget>[
-                      if (filterMode)
-                        IconButton(
-                          icon: const Icon(Icons.clear),
-                          onPressed: () {
-                            setState(() {
-                              filterMode = false;
-                              filter = {};
-                            });
-                            bloc.add(GetAllMahasiswaEvent(true));
-                          },
-                        )
-                      else if (searchMode)
+                      if (searchMode)
                         IconButton(
                           icon: const Icon(Icons.close),
                           onPressed: () {
@@ -197,7 +237,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _dataMahasiswa(mahasiswa, BuildContext context) {
     return InkWell(
-      onTap: () => GoRouter.of(context).goNamed('detail', extra: mahasiswa.nim),
+      onTap: () =>
+          GoRouter.of(context).pushNamed('detail', extra: mahasiswa.nim),
       child: ListTile(
         title: Text(mahasiswa.name ?? 'No Name'),
         subtitle: Text(mahasiswa.nim.toString()),
@@ -207,6 +248,30 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _showFilter(BuildContext context) {
     final bloc = context.read<MahasiswaBloc>();
-    showFilterModal(context, setFilterMode, bloc);
+    showFilterModal(
+      context,
+      setFilterMode,
+      bloc,
+      initialFacultyOptions: facultyOptions,
+      initialMajorOptions: majorOptions,
+      initialCityOptions: cityOptions,
+      initialSelectedOrder: selectedOrder,
+      initialOrderSwitch: orderSwitch,
+      onPersistOptions: (
+        Map<String, bool> newFaculty,
+        Map<String, bool> newMajor,
+        Map<String, bool> newCity,
+        String newSelectedOrder,
+        bool newOrderSwitch,
+      ) {
+        setState(() {
+          facultyOptions = newFaculty;
+          majorOptions = newMajor;
+          cityOptions = newCity;
+          selectedOrder = newSelectedOrder;
+          orderSwitch = newOrderSwitch;
+        });
+      },
+    );
   }
 }

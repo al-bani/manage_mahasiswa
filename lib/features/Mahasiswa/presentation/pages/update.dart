@@ -25,7 +25,12 @@ class UpdateScreen extends StatelessWidget {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Data Has Been Updated!')),
               );
-              GoRouter.of(context).goNamed('detail', extra: nim);
+              // Kembali ke halaman sebelumnya (detail) dengan mengirim flag sukses
+              if (GoRouter.of(context).canPop()) {
+                GoRouter.of(context).pop(true);
+              } else {
+                Navigator.of(context).pop(true);
+              }
             } else if (state is RemoteMahasiswaError) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Error While Update Data')),
@@ -188,9 +193,14 @@ Widget _appbody(BuildContext context, int nimMhs) {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: InkWell(
-                    onTap: () =>
-                        GoRouter.of(context).goNamed('detail', extra: nimMhs),
-                    child: const Text('Back to Home'),
+                    onTap: () {
+                      if (GoRouter.of(context).canPop()) {
+                        GoRouter.of(context).pop();
+                      } else {
+                        Navigator.of(context).maybePop();
+                      }
+                    },
+                    child: const Text('Back to Detail'),
                   ),
                 ),
               ],

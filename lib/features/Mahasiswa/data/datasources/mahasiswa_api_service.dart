@@ -147,8 +147,6 @@ class MahasiswaApiServiceImpl extends MahasiswaApiService {
 
     filter['admin_id'] = adminId;
 
-    print(filter);
-
     try {
       var response = await dio.post(url, data: filter);
       return response;

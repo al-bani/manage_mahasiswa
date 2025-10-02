@@ -4,54 +4,29 @@ import 'package:manage_mahasiswa/features/Mahasiswa/presentation/bloc/mahasiswa_
 void showFilterModal(
   BuildContext context,
   void Function(bool, Map<String, dynamic>, MahasiswaBloc) setFilterMode,
-  MahasiswaBloc bloc,
-) {
-  String selectedOrder = "A-Z (NIM)";
-  bool orderSwitch = false;
+  MahasiswaBloc bloc, {
+  required Map<String, bool> initialFacultyOptions,
+  required Map<String, bool> initialMajorOptions,
+  required Map<String, bool> initialCityOptions,
+  required String initialSelectedOrder,
+  required bool initialOrderSwitch,
+  required void Function(
+    Map<String, bool> faculty,
+    Map<String, bool> major,
+    Map<String, bool> city,
+    String selectedOrder,
+    bool orderSwitch,
+  ) onPersistOptions,
+}) {
+  String selectedOrder = initialSelectedOrder;
+  bool orderSwitch = initialOrderSwitch;
 
-  Map<String, bool> facultyOptions = {
-    "Ekonomi": false,
-    "Teknik": false,
-    "Kedokteran": false,
-    "Hukum": false,
-    "Ilmu Komunikasi": false,
-    "Sastra": false,
-    "teknik": false,
-    "Ilmu Sosial": false,
-  };
+  Map<String, bool> facultyOptions =
+      Map<String, bool>.from(initialFacultyOptions);
 
-  Map<String, bool> majorOptions = {
-    "Antropologi": false,
-    "Mesin": false,
-    "Industri": false,
-    "Farmasi": false,
-    "informatika": false,
-    "Public Relations": false,
-    "Kedokteran Umum": false,
-    "Bahasa Prancis": false,
-    "Informatika": false,
-    "Sosiologi": false,
-    "Akuntansi": false,
-    "Elektro": false,
-    "Bisnis": false,
-    "Sipil": false,
-    "Jurnalistik": false,
-    "Ilmu Hukum": false,
-    "Kedokteran Gigi": false,
-    "Manajemen": false,
-    "Bahasa Inggris": false,
-    "Kimia": false,
-  };
+  Map<String, bool> majorOptions = Map<String, bool>.from(initialMajorOptions);
 
-  Map<String, bool> cityOptions = {
-    "Jakarta": false,
-    "Bandung": false,
-    "Surabaya": false,
-    "Yogyakarta": false,
-    "Medan": false,
-    "Semarang": false,
-    "Makassar": false,
-  };
+  Map<String, bool> cityOptions = Map<String, bool>.from(initialCityOptions);
 
   showModalBottomSheet(
     context: context,
@@ -182,6 +157,15 @@ void showFilterModal(
                             } else if (selectedOrder == "Z-A (Name)") {
                               filter["orderBy"]["name"] = "desc";
                             }
+
+                            // Persist pilihan ke parent sebelum terapkan
+                            onPersistOptions(
+                              Map<String, bool>.from(facultyOptions),
+                              Map<String, bool>.from(majorOptions),
+                              Map<String, bool>.from(cityOptions),
+                              selectedOrder,
+                              orderSwitch,
+                            );
 
                             setFilterMode(
                               true,

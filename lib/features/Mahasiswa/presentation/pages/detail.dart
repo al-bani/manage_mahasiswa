@@ -103,7 +103,7 @@ Widget _bodyApp() {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     ElevatedButton(
-                      onPressed: () => GoRouter.of(context).goNamed('home'),
+                      onPressed: () => GoRouter.of(context).pop(),
                       style: BtnStyle,
                       child: const Text("Back"),
                     ),
@@ -118,8 +118,16 @@ Widget _bodyApp() {
                         ),
                         const SizedBox(width: 10),
                         ElevatedButton(
-                          onPressed: () => GoRouter.of(context)
-                              .goNamed('update', extra: mhs.nim!),
+                          onPressed: () async {
+                            final result = await GoRouter.of(context)
+                                .pushNamed('update', extra: mhs.nim!);
+                            if (result == true) {
+                              // abaikan jika bloc sudah loading.
+                              context
+                                  .read<MahasiswaBloc>()
+                                  .add(GetMahasiswaEvent(mhs.nim!));
+                            }
+                          },
                           style: BtnStyle,
                           child: const Text("Update"),
                         ),
