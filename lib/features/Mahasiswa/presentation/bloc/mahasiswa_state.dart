@@ -35,6 +35,12 @@ class RemoteSearchMahasiswaGetList extends MahasiswaState {
   const RemoteSearchMahasiswaGetList({required this.mahasiswa});
 }
 
+class RemoteMahasiswaFilterGetList extends MahasiswaState {
+  final List<MahasiswaEntity> mahasiswa;
+
+  const RemoteMahasiswaFilterGetList({required this.mahasiswa});
+}
+
 class RemoteMahasiswaDoneList extends MahasiswaState {
   final List<MahasiswaEntity> mahasiswa;
   final bool hasMoreData;

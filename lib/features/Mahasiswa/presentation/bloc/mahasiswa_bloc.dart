@@ -5,6 +5,7 @@ import 'package:manage_mahasiswa/features/Auth/domain/entities/admin_entity.dart
 import 'package:manage_mahasiswa/features/Mahasiswa/domain/entities/mahasiswa_entity.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/domain/usecases/create_mahasiswa.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/domain/usecases/delete_mahasiswa.dart';
+import 'package:manage_mahasiswa/features/Mahasiswa/domain/usecases/filter_mahasiswa.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/domain/usecases/get_mahasiswa_all.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/domain/usecases/get_mahasiswa_detail.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/domain/usecases/search_mahasiswa.dart';
@@ -19,6 +20,7 @@ class MahasiswaBloc extends Bloc<MahasiswaEvent, MahasiswaState> {
   final CreateMahasiswaUseCase _createMahasiswaUseCase;
   final UpdateMahasiswaUseCase _updateMahasiswaUseCase;
   final SearchMahasiswaUseCase _searchMahasiswaUseCase;
+  final FilterMahasiswaUseCase _filterMahasiswaUseCase;
 
   MahasiswaBloc(
     this._getMhsAllUsecase,
@@ -27,6 +29,7 @@ class MahasiswaBloc extends Bloc<MahasiswaEvent, MahasiswaState> {
     this._createMahasiswaUseCase,
     this._updateMahasiswaUseCase,
     this._searchMahasiswaUseCase,
+    this._filterMahasiswaUseCase,
   ) : super(const RemoteMahasiswaInitial()) {
     on<GetAllMahasiswaEvent>(onGetAllMahasiswa);
     on<GetMahasiswaEvent>(onGetMahasiswa);
@@ -34,6 +37,7 @@ class MahasiswaBloc extends Bloc<MahasiswaEvent, MahasiswaState> {
     on<CreateMahasiswaEvent>(onCreateMahasiswa);
     on<UpdateMahasiswaEvent>(onUpdateMahasiswa);
     on<SearchMahasiswaEvent>(onSearchMahasiswa);
+    on<FilterMahasiswaEvent>(onFilterMahasiswa);
   }
 
   int page = 1;
@@ -64,6 +68,19 @@ class MahasiswaBloc extends Bloc<MahasiswaEvent, MahasiswaState> {
 
       emit(RemoteMahasiswaDoneList(
           mahasiswa: mahasiswa, hasMoreData: hasMoreData));
+    }
+  }
+
+  void onFilterMahasiswa(
+      FilterMahasiswaEvent event, Emitter<MahasiswaState> emit) async {
+    AdminEntity? data = await getAdminData();
+    final dataState = await _filterMahasiswaUseCase.execute(
+        data!.token!, data.id!, event.filter);
+
+    if (dataState is DataFailed) {
+      emit(RemoteMahasiswaError(dataState.error!));
+    } else if (dataState is DataSuccess) {
+      emit(RemoteMahasiswaFilterGetList(mahasiswa: dataState.data!));
     }
   }
 

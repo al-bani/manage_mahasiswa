@@ -11,6 +11,7 @@ import 'package:manage_mahasiswa/features/Mahasiswa/data/repositories/mahasiswa_
 import 'package:manage_mahasiswa/features/Mahasiswa/domain/repositories/mahasiswa_repository.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/domain/usecases/create_mahasiswa.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/domain/usecases/delete_mahasiswa.dart';
+import 'package:manage_mahasiswa/features/Mahasiswa/domain/usecases/filter_mahasiswa.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/domain/usecases/get_mahasiswa_all.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/domain/usecases/get_mahasiswa_detail.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/domain/usecases/search_mahasiswa.dart';
@@ -36,6 +37,8 @@ Future<void> init() async {
       () => UpdateMahasiswaUseCase(containerInjection()));
   containerInjection.registerLazySingleton(
       () => SearchMahasiswaUseCase(containerInjection()));
+  containerInjection.registerLazySingleton(
+      () => FilterMahasiswaUseCase(containerInjection()));
   containerInjection.registerFactory(() => MahasiswaBloc(
         containerInjection<GetMahasiswaAllUseCase>(),
         containerInjection<GetMahasiswaDetailUseCase>(),
@@ -43,6 +46,7 @@ Future<void> init() async {
         containerInjection<CreateMahasiswaUseCase>(),
         containerInjection<UpdateMahasiswaUseCase>(),
         containerInjection<SearchMahasiswaUseCase>(),
+        containerInjection<FilterMahasiswaUseCase>(),
       ));
 
   //admin

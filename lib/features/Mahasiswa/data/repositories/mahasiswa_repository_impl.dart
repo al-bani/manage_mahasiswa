@@ -36,6 +36,27 @@ class MahasiswaRepositoryImpl extends MahasiswaRepository {
     if (response.statusCode == 404) {
       return DataFailed(response.data);
     }
+
+    Map<String, dynamic> result = response.data;
+
+    if (result.containsKey('result')) {
+      List<MahasiswaModel> data = MahasiswaModel.fromJsonList(result["result"]);
+
+      return DataSuccess(data);
+    } else {
+      return DataFailed(result);
+    }
+  }
+
+  @override
+  Future<DataState<List<MahasiswaEntity>>> filterMahasiswa(
+      String token, int adminId, Map<String, dynamic> filter) async {
+    Response response =
+        await _mahasiswaApiService.filterMahasiswa(token, adminId, filter);
+    if (response.statusCode == 404) {
+      return DataFailed(response.data);
+    }
+
     Map<String, dynamic> result = response.data;
 
     if (result.containsKey('result')) {

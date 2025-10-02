@@ -8,8 +8,9 @@ abstract class MahasiswaApiService {
   Future createMahasiswa(MahasiswaEntity mhs, String token, int adminId);
   Future updateMahasiswa(
       MahasiswaEntity mhs, String token, int adminId, int nim);
-
-  searchMahasiswa(String token, int adminId, String search) {}
+  Future searchMahasiswa(String token, int adminId, String search);
+  Future filterMahasiswa(
+      String token, int adminId, Map<String, dynamic> filter);
 }
 
 class MahasiswaApiServiceImpl extends MahasiswaApiService {
@@ -122,7 +123,8 @@ class MahasiswaApiServiceImpl extends MahasiswaApiService {
   }
 
   @override
-  Future<Response> searchMahasiswa(String token, int adminId, String search) async {
+  Future<Response> searchMahasiswa(
+      String token, int adminId, String search) async {
     String url = "http://localhost:3000/api/mahasiswa/search";
     dio.options.headers['Authorization'] = token;
 
@@ -131,6 +133,24 @@ class MahasiswaApiServiceImpl extends MahasiswaApiService {
     try {
       var response = await dio.get(url,
           queryParameters: {'key': search}, data: rawParameter);
+      return response;
+    } on DioException catch (e) {
+      return e.response!;
+    }
+  }
+
+  @override
+  Future<Response> filterMahasiswa(
+      String token, int adminId, Map<String, dynamic> filter) async {
+    String url = "http://localhost:3000/api/mahasiswa/filter";
+    dio.options.headers['Authorization'] = token;
+
+    filter['admin_id'] = adminId;
+
+    print(filter);
+
+    try {
+      var response = await dio.post(url, data: filter);
       return response;
     } on DioException catch (e) {
       return e.response!;

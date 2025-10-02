@@ -18,6 +18,14 @@ class SearchMahasiswaEvent extends MahasiswaEvent {
   List<Object?> get props => [];
 }
 
+class FilterMahasiswaEvent extends MahasiswaEvent {
+  final Map<String, dynamic> filter;
+
+  FilterMahasiswaEvent(this.filter);
+
+  List<Object?> get props => [];
+}
+
 class GetMahasiswaEvent extends MahasiswaEvent {
   final int nim;
 
