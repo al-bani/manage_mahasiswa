@@ -15,4 +15,5 @@ abstract class MahasiswaRepository {
       String token, int adminId, String search);
   Future<DataState<List<MahasiswaEntity>>> filterMahasiswa(
       String token, int adminId, Map<String, dynamic> filter);
+  Future<DataState<Map<String, dynamic>>> getDashboardMahasiswa();
 }

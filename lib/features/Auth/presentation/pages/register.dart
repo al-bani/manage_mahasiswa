@@ -15,6 +15,8 @@ class RegisterScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.primary,
+      resizeToAvoidBottomInset: true,
       body: BlocProvider(
         create: (context) => containerInjection<AuthBloc>(),
         child: BlocListener<AuthBloc, AuthState>(
@@ -45,58 +47,119 @@ class RegisterScreen extends StatelessWidget {
 
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
-        return Container(
-          margin: const EdgeInsets.all(30),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text(
-                  "Register",
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 20),
-                NormalFiled(text: "Email", controller: emailController),
-                const SizedBox(height: 10),
-                NormalFiled(text: "Username", controller: usernameController),
-                const SizedBox(height: 10),
-                PasswordField(
-                    passwordValue: passwordController, text: "Password"),
-                const SizedBox(height: 10),
-                PasswordField(
-                    passwordValue: confirmPasswordController,
-                    text: "Confirm Password"),
-                const SizedBox(height: 10),
-                _alignPasswordRequirement(),
-                const SizedBox(height: 30),
-                state is RemoteAuthLoading
-                    ? const CircularProgressIndicator()
-                    : ElevatedButton(
-                        onPressed: () => _onRegisterPressed(
-                            context,
-                            emailController.text,
-                            usernameController.text,
-                            passwordController.text,
-                            confirmPasswordController.text),
-                        style: BtnStyle,
-                        child: const Text(
-                          "Register",
-                          style: TextStyle(color: Colors.white),
-                        ),
+        final isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
+
+        return SafeArea(
+          child: Column(
+            children: [
+              // Header Section - Menyesuaikan dengan keyboard
+              Flexible(
+                flex: isKeyboardVisible
+                    ? 1
+                    : 2, // Lebih kecil ketika keyboard muncul
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+                  width: double.infinity,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Create",
+                        style: AppTextStyles.openSansBold(
+                            fontSize: 28, color: AppColors.secondary),
                       ),
-                const SizedBox(height: 10),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: InkWell(
-                    onTap: () => GoRouter.of(context).goNamed('login'),
-                    child: const Text(
-                      "already have an account, Login now",
-                      style: TextStyle(fontSize: 12),
+                      Text(
+                        "Your Account",
+                        style: AppTextStyles.openSansBold(
+                            fontSize: 28, color: AppColors.white),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              // Form Section - Flexible berdasarkan keyboard
+              Flexible(
+                flex: isKeyboardVisible
+                    ? 4
+                    : 3, // Lebih besar ketika keyboard muncul
+                child: Container(
+                  width: double.infinity,
+                  decoration: const BoxDecoration(
+                    color: AppColors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(40),
+                      topRight: Radius.circular(40),
                     ),
                   ),
-                )
-              ],
-            ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 28, vertical: 30),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        AppTextField(
+                          controller: usernameController,
+                          hintText: "Insert your Username",
+                        ),
+                        const SizedBox(height: 20),
+                        AppTextField(
+                          controller: emailController,
+                          hintText: "Insert your Email",
+                        ),
+                        const SizedBox(height: 20),
+                        AppPasswordTextField(
+                          controller: passwordController,
+                          hintText: "Insert your Password",
+                        ),
+                        const SizedBox(height: 20),
+                        AppPasswordTextField(
+                          controller: confirmPasswordController,
+                          hintText: "Confirm your Password",
+                        ),
+                        const SizedBox(height: 10),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            "Password must contains\none character and one number",
+                            style: AppTextStyles.openSansItalic(
+                              fontSize: 12,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 30),
+                        state is RemoteAuthLoading
+                            ? const CircularProgressIndicator()
+                            : Column(
+                                children: [
+                                  AppButton(
+                                    text: "Register",
+                                    onPressed: () => _onRegisterPressed(
+                                      context,
+                                      emailController.text,
+                                      usernameController.text,
+                                      passwordController.text,
+                                      confirmPasswordController.text,
+                                    ),
+                                    backgroundColor: AppColors.secondary,
+                                  ),
+                                  const SizedBox(height: 10),
+                                  AppButton(
+                                    text: "Login",
+                                    onPressed: () =>
+                                        GoRouter.of(context).goNamed('login'),
+                                    backgroundColor: AppColors.primary,
+                                  ),
+                                ],
+                              ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         );
       },

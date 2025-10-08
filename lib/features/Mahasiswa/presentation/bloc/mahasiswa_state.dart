@@ -103,3 +103,12 @@ class RemoteMahasiswaUpdate extends MahasiswaState {
   @override
   List<Object?> get props => [mhs];
 }
+
+class RemoteDashboardMahasiswa extends MahasiswaState {
+  final Map<String, dynamic> data;
+
+  const RemoteDashboardMahasiswa({required this.data});
+
+  @override
+  List<Object?> get props => [data];
+}

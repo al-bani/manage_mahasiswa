@@ -3,6 +3,7 @@ import 'package:manage_mahasiswa/features/Auth/presentation/pages/login.dart';
 import 'package:manage_mahasiswa/features/Auth/presentation/pages/register.dart';
 import 'package:manage_mahasiswa/features/Auth/presentation/pages/verification.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/presentation/pages/create.dart';
+import 'package:manage_mahasiswa/features/Mahasiswa/presentation/pages/dashboard.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/presentation/pages/detail.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/presentation/pages/home.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/presentation/pages/search.dart';
@@ -14,8 +15,15 @@ class AppRouter {
   AppRouter({required this.isLoggedIn});
 
   GoRouter get router => GoRouter(
-        initialLocation: isLoggedIn ? '/home' : '/auth/login',
+        initialLocation: isLoggedIn ? '/dashboard' : '/auth/login',
         routes: [
+          GoRoute(
+            path: '/dashboard',
+            name: 'dashboard',
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: DashboardScreen(),
+            ),
+          ),
           GoRoute(
             path: '/home',
             name: 'home',

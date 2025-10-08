@@ -6,6 +6,7 @@ import 'package:manage_mahasiswa/features/Mahasiswa/domain/entities/mahasiswa_en
 import 'package:manage_mahasiswa/features/Mahasiswa/presentation/bloc/mahasiswa_bloc.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/presentation/bloc/mahasiswa_event.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/presentation/bloc/mahasiswa_state.dart';
+import 'package:manage_mahasiswa/features/Mahasiswa/presentation/widgets/bottom_bar.dart';
 import 'package:manage_mahasiswa/injection_container.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/presentation/pages/home_filter.dart';
 
@@ -120,6 +121,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      bottomNavigationBar: const BottomNavBar(currentIndex: 0),
       body: BlocProvider.value(
         value: bloc,
         child: BlocBuilder<MahasiswaBloc, MahasiswaState>(

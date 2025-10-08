@@ -132,4 +132,19 @@ class MahasiswaRepositoryImpl extends MahasiswaRepository {
       return DataFailed(result);
     }
   }
+
+  @override
+  Future<DataState<Map<String, dynamic>>> getDashboardMahasiswa() async {
+    Response response = await _mahasiswaApiService.getDashboardMahasiswa();
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> result = response.data;
+      Map<String, dynamic> data = result["result"];
+
+      return DataSuccess(data);
+    } else {
+      Map<String, dynamic> result = response.data;
+      return DataFailed(result);
+    }
+  }
 }

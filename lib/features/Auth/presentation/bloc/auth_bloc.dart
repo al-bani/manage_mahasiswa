@@ -22,7 +22,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   void onAdminLogin(LoginEvent event, Emitter<AuthState> emit) async {
-    emit(const RemoteAuthLoading()); 
+    emit(const RemoteAuthLoading());
 
     final dataState =
         await _loginUseCase.executeLogin(event.username, event.password);
@@ -68,22 +68,27 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   void onResendOTP(ResendOTPEvent event, Emitter<AuthState> emit) async {
     emit(const RemoteAuthLoading());
-    final dataStateResend = await _otpUseCase.resendOtpExecute(event.email);
+    try {
+      final dataStateResend = await _otpUseCase.resendOtpExecute(event.email);
 
-    if (dataStateResend is DataSuccess && dataStateResend.data!.isNotEmpty) {
-      final dataStateSend = await _otpUseCase.sendOtpExecute(event.email);
-
-      if (dataStateSend is DataSuccess && dataStateSend.data!.isNotEmpty) {
-        emit(RemoteAuthSendOTP(dataStateSend.data!));
+      if (dataStateResend is DataSuccess && dataStateResend.data != null) {
+        final Map<String, dynamic> data = dataStateResend.data!;
+        final String message =
+            (data["msg"] ?? "OTP berhasil dikirim").toString();
+        emit(RemoteAuthSendOTP(message));
+        return;
       }
 
-      if (dataStateSend is DataFailed) {
-        emit(RemoteAuthFailed(dataStateSend.error!));
+      if (dataStateResend is DataFailed) {
+        emit(RemoteAuthFailed(dataStateResend.error!));
+        return;
       }
-    }
 
-    if (dataStateResend is DataFailed) {
-      emit(RemoteAuthFailed(dataStateResend.error!));
+      // Fallback bila tidak ada state yang ter-cover di atas
+      emit(const RemoteAuthFailed({"msg": "Resend OTP tidak berhasil"}));
+    } catch (e) {
+      emit(
+          const RemoteAuthFailed({"msg": "Terjadi kesalahan saat resend OTP"}));
     }
   }
 

@@ -4,6 +4,7 @@ import 'package:manage_mahasiswa/core/resources/data_state.dart';
 import 'package:manage_mahasiswa/features/Auth/domain/entities/admin_entity.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/domain/entities/mahasiswa_entity.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/domain/usecases/create_mahasiswa.dart';
+import 'package:manage_mahasiswa/features/Mahasiswa/domain/usecases/dashboard_mahasiswa.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/domain/usecases/delete_mahasiswa.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/domain/usecases/filter_mahasiswa.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/domain/usecases/get_mahasiswa_all.dart';
@@ -21,6 +22,7 @@ class MahasiswaBloc extends Bloc<MahasiswaEvent, MahasiswaState> {
   final UpdateMahasiswaUseCase _updateMahasiswaUseCase;
   final SearchMahasiswaUseCase _searchMahasiswaUseCase;
   final FilterMahasiswaUseCase _filterMahasiswaUseCase;
+  final DashboardMahasiswaUseCase _dashboardMahasiswaUseCase;
 
   MahasiswaBloc(
     this._getMhsAllUsecase,
@@ -30,6 +32,7 @@ class MahasiswaBloc extends Bloc<MahasiswaEvent, MahasiswaState> {
     this._updateMahasiswaUseCase,
     this._searchMahasiswaUseCase,
     this._filterMahasiswaUseCase,
+    this._dashboardMahasiswaUseCase,
   ) : super(const RemoteMahasiswaInitial()) {
     on<GetAllMahasiswaEvent>(onGetAllMahasiswa);
     on<GetMahasiswaEvent>(onGetMahasiswa);
@@ -38,6 +41,7 @@ class MahasiswaBloc extends Bloc<MahasiswaEvent, MahasiswaState> {
     on<UpdateMahasiswaEvent>(onUpdateMahasiswa);
     on<SearchMahasiswaEvent>(onSearchMahasiswa);
     on<FilterMahasiswaEvent>(onFilterMahasiswa);
+    on<DashboardMahasiswaEvent>(onDashboardMahasiswa);
   }
 
   int page = 1;
@@ -153,6 +157,18 @@ class MahasiswaBloc extends Bloc<MahasiswaEvent, MahasiswaState> {
       emit(RemoteMahasiswaDone(mahasiswa: event.mhs));
     } else if (dataState is DataFailed) {
       emit(RemoteMahasiswaError(dataState.error!));
+    }
+  }
+
+  void onDashboardMahasiswa(
+      DashboardMahasiswaEvent event, Emitter<MahasiswaState> emit) async {
+    emit(const RemoteMahasiswaLoading());
+    final dataState = await _dashboardMahasiswaUseCase.execute();
+
+    if (dataState is DataFailed) {
+      emit(RemoteMahasiswaError(dataState.error!));
+    } else if (dataState is DataSuccess) {
+      emit(RemoteDashboardMahasiswa(data: dataState.data!));
     }
   }
 }

@@ -52,3 +52,8 @@ class UpdateMahasiswaEvent extends MahasiswaEvent {
 
   UpdateMahasiswaEvent(this.mhs, this.nim);
 }
+
+class DashboardMahasiswaEvent extends MahasiswaEvent{
+
+  DashboardMahasiswaEvent();
+}

@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:manage_mahasiswa/features/Auth/domain/entities/admin_entity.dart';
 import 'package:manage_mahasiswa/features/Auth/data/models/admin_model.dart';
 
@@ -15,7 +16,7 @@ class AdminApiServiceImpl extends AdminApiService {
 
   @override
   Future login(String username, String password) async {
-    String url = "http://localhost:3000/api/admin/login";
+    String url = "${dotenv.env['API_URL']}/api/admin/login";
 
     Map<String, dynamic> queryParams = {
       'username': username,
@@ -24,15 +25,17 @@ class AdminApiServiceImpl extends AdminApiService {
 
     try {
       var response = await dio.post(url, data: queryParams);
+      print(response);
       return response;
     } on DioException catch (e) {
+      print(e);
       return e.response;
     }
   }
 
   @override
   Future register(AdminEntity data) async {
-    String url = "http://localhost:3000/api/admin/register";
+    String url = "${dotenv.env['API_URL']}/api/admin/register";
 
     try {
       var response = await dio.post(url, data: AdminModel.toJson(data));
@@ -45,7 +48,7 @@ class AdminApiServiceImpl extends AdminApiService {
 
   @override
   Future<Response?> sendOTP(String email) async {
-    String url = "http://localhost:3000/api/admin/register/$email/otp";
+    String url = "${dotenv.env['API_URL']}/api/admin/register/$email/otp";
 
     try {
       var response = await dio.get(url);
@@ -58,7 +61,7 @@ class AdminApiServiceImpl extends AdminApiService {
 
   @override
   Future verifyOTP(String email, int otpInput) async {
-    String url = "http://localhost:3000/api/admin/register/$email/verify";
+    String url = "${dotenv.env['API_URL']}/api/admin/register/$email/verify";
     Map<String, int> otp = {"otp": otpInput};
 
     try {
@@ -71,7 +74,7 @@ class AdminApiServiceImpl extends AdminApiService {
 
   @override
   Future resendOTP(String email) async {
-    String url = "http://localhost:3000/api/admin/register/$email/otp";
+    String url = "${dotenv.env['API_URL']}/api/admin/register/$email/otp";
 
     try {
       var response = await dio.get(url);

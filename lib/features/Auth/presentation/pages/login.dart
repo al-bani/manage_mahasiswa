@@ -18,6 +18,7 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.primary,
       body: BlocProvider(
         create: (context) => containerInjection<AuthBloc>(),
         child: BlocListener<AuthBloc, AuthState>(
@@ -42,76 +43,109 @@ class LoginScreen extends StatelessWidget {
 _appBody(context) {
   return BlocBuilder<AuthBloc, AuthState>(
     builder: (context, state) {
-      return Container(
-        margin: const EdgeInsets.all(30),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              "Login",
-              style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 30),
-            TextFormField(
-              controller: username,
-              style: const TextStyle(
-                color: Colors.black,
-                fontSize: 20,
+      return Column(
+        children: [
+          Expanded(
+            flex: 2,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+              width: double.infinity,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Hello",
+                    style: AppTextStyles.openSansBold(
+                        fontSize: 28, color: AppColors.secondary),
+                  ),
+                  Text(
+                    "Welcome back",
+                    style: AppTextStyles.openSansBold(
+                        fontSize: 28, color: AppColors.white),
+                  ),
+                  Text(
+                    "Glad to see you again !",
+                    style: AppTextStyles.openSansBold(
+                        fontSize: 28, color: AppColors.white),
+                  ),
+                ],
               ),
-              decoration: const InputDecoration(
-                border: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.black, width: 2),
-                ),
-                labelText: "Username",
-                labelStyle: TextStyle(
-                  color: Colors.black,
-                  fontSize: 16,
-                  fontStyle: FontStyle.italic,
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              width: double.infinity,
+              decoration: const BoxDecoration(
+                color: AppColors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(40),
+                  topRight: Radius.circular(40),
                 ),
               ),
-            ),
-            const SizedBox(height: 10),
-            PasswordField(passwordValue: password, text: "Password"),
-            const SizedBox(height: 20),
-            isBtnLoading
-                ? const CircularProgressIndicator()
-                : ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue[300],
-                      fixedSize:
-                          Size.fromWidth(MediaQuery.of(context).size.width),
-                    ),
-                    onPressed: () {
-                      if (username.text.isEmpty || password.text.isEmpty) {
-                        _loginFailed(
-                            context, state, "fill username and password");
-                      } else {
-                        BlocProvider.of<AuthBloc>(context).add(
-                          LoginEvent(username.text, password.text),
-                        );
-                      }
-                    },
-                    child: const Text(
-                      "Login",
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 50),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  AppTextField(
+                    controller: username,
+                    hintText: "Insert your Username",
+                  ),
+                  const SizedBox(height: 20),
+                  AppPasswordTextField(
+                    controller: password,
+                    hintText: "Insert your Password",
+                  ),
+                  const SizedBox(height: 10),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: InkWell(
+                      onTap: () => GoRouter.of(context).goNamed('register'),
+                      child: const Text(
+                        "Forgot Password",
                       ),
                     ),
                   ),
-            const SizedBox(height: 20),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: InkWell(
-                onTap: () => GoRouter.of(context).goNamed('register'),
-                child: const Txt(
-                    value: "Don't have an account? register here",
-                    size: 14,
-                    align: TextAlign.center),
+                  const SizedBox(height: 50),
+                  isBtnLoading
+                      ? const CircularProgressIndicator()
+                      : Column(
+                          children: [
+                            AppButton(
+                              text: "Login",
+                              onPressed: () {
+                                if (username.text.isEmpty ||
+                                    password.text.isEmpty) {
+                                  _loginFailed(context, state,
+                                      "fill username and password");
+                                } else {
+                                  BlocProvider.of<AuthBloc>(context).add(
+                                    LoginEvent(username.text, password.text),
+                                  );
+                                }
+                              },
+                              backgroundColor: AppColors.primary,
+                            ),
+                            const SizedBox(height: 10),
+                            AppButton(
+                              text: "Register",
+                              onPressed: () =>
+                                  GoRouter.of(context).goNamed('register'),
+                              backgroundColor: AppColors.secondary,
+                            ),
+                          ],
+                        ),
+                  const SizedBox(height: 20),
+                  Text(
+                    "Or Continue With",
+                    style: AppTextStyles.openSansItalic(fontSize: 12),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       );
     },
   );
@@ -119,6 +153,7 @@ _appBody(context) {
 
 _loginSuccess(context, data) async {
   await setLoginStatus(data);
+
   GoRouter.of(context).goNamed('home');
 }
 

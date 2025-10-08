@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/domain/entities/mahasiswa_entity.dart';
 
 abstract class MahasiswaApiService {
@@ -11,15 +12,27 @@ abstract class MahasiswaApiService {
   Future searchMahasiswa(String token, int adminId, String search);
   Future filterMahasiswa(
       String token, int adminId, Map<String, dynamic> filter);
+  Future getDashboardMahasiswa();
 }
 
 class MahasiswaApiServiceImpl extends MahasiswaApiService {
-  Dio dio = Dio();
+  Dio dio = Dio()
+    ..options.connectTimeout = const Duration(seconds: 10)
+    ..options.receiveTimeout = const Duration(seconds: 10)
+    ..options.sendTimeout = const Duration(seconds: 10)
+    ..interceptors.add(
+      LogInterceptor(
+        request: true,
+        requestBody: true,
+        responseBody: true,
+        error: true,
+      ),
+    );
 
   @override
   Future<Response> getAllMahasiswa(
       String token, int adminId, bool isFirstTimePage) async {
-    String url = "http://localhost:3000/api/mahasiswa/all";
+    String url = "${dotenv.env['API_URL']}/api/mahasiswa/all";
     dio.options.headers['Authorization'] = token;
     Map<String, dynamic> queryParams = {
       'admin_id': adminId,
@@ -37,7 +50,7 @@ class MahasiswaApiServiceImpl extends MahasiswaApiService {
   @override
   Future<Response> getDetailMahasiswa(
       String token, int adminId, int nim) async {
-    String url = "http://localhost:3000/api/mahasiswa/$nim";
+    String url = "${dotenv.env['API_URL']}/api/mahasiswa/$nim";
     dio.options.headers['Authorization'] = token;
     Map<String, dynamic> queryParams = {
       'admin_id': adminId,
@@ -53,7 +66,7 @@ class MahasiswaApiServiceImpl extends MahasiswaApiService {
 
   @override
   Future<Response> deleteMahasiswa(String token, int adminId, int nim) async {
-    String url = "http://localhost:3000/api/mahasiswa/delete/$nim";
+    String url = "${dotenv.env['API_URL']}/api/mahasiswa/delete/$nim";
     dio.options.headers['Authorization'] = token;
     Map<String, dynamic> queryParams = {
       'admin_id': adminId,
@@ -71,7 +84,7 @@ class MahasiswaApiServiceImpl extends MahasiswaApiService {
   @override
   Future<Response> createMahasiswa(
       MahasiswaEntity mhs, String token, int adminId) async {
-    String url = "http://localhost:3000/api/mahasiswa/create";
+    String url = "${dotenv.env['API_URL']}/api/mahasiswa/create";
     dio.options.headers['Authorization'] = token;
     Map<String, dynamic> queryParams = {
       "admin_id": adminId,
@@ -98,7 +111,7 @@ class MahasiswaApiServiceImpl extends MahasiswaApiService {
   @override
   Future<Response> updateMahasiswa(
       MahasiswaEntity mhs, String token, int adminId, int nim) async {
-    String url = "http://localhost:3000/api/mahasiswa/update/$nim";
+    String url = "${dotenv.env['API_URL']}/api/mahasiswa/update/$nim";
     dio.options.headers['Authorization'] = token;
     Map<String, dynamic> queryParams = {
       "admin_id": adminId,
@@ -125,7 +138,7 @@ class MahasiswaApiServiceImpl extends MahasiswaApiService {
   @override
   Future<Response> searchMahasiswa(
       String token, int adminId, String search) async {
-    String url = "http://localhost:3000/api/mahasiswa/search";
+    String url = "${dotenv.env['API_URL']}/api/mahasiswa/search";
     dio.options.headers['Authorization'] = token;
 
     Map<String, dynamic> rawParameter = {'admin_id': adminId};
@@ -142,7 +155,7 @@ class MahasiswaApiServiceImpl extends MahasiswaApiService {
   @override
   Future<Response> filterMahasiswa(
       String token, int adminId, Map<String, dynamic> filter) async {
-    String url = "http://localhost:3000/api/mahasiswa/filter";
+    String url = "${dotenv.env['API_URL']}/api/mahasiswa/filter";
     dio.options.headers['Authorization'] = token;
 
     filter['admin_id'] = adminId;
@@ -152,6 +165,26 @@ class MahasiswaApiServiceImpl extends MahasiswaApiService {
       return response;
     } on DioException catch (e) {
       return e.response!;
+    }
+  }
+
+  @override
+  Future<Response> getDashboardMahasiswa() async {
+    String url = "${dotenv.env['API_URL']}/api/mahasiswa/dashboard";
+
+    try {
+      var response = await dio.get(url);
+
+      return response;
+    } on DioException catch (e) {
+      return Response(
+        requestOptions: e.requestOptions,
+        statusCode: 599,
+        data: {
+          "msg": e.message ?? "Network error",
+          "type": e.type.toString(),
+        },
+      );
     }
   }
 }
