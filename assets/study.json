@@ -1,0 +1,71 @@
+{
+  "fakultas": [
+    {
+      "nama": "Fakultas Kedokteran (FK)",
+      "prodi": [
+        "Pendidikan Dokter",
+        "Kedokteran Gigi",
+        "Keperawatan",
+        "Farmasi",
+        "Gizi",
+        "Kedokteran Hewan"
+      ]
+    },
+    {
+      "nama": "Fakultas Ekonomi dan Bisnis (FEB)",
+      "prodi": [
+        "Manajemen",
+        "Akuntansi",
+        "Ekonomi Pembangunan",
+        "Keuangan dan Perbankan",
+        "Ekonomi Syariah",
+        "Bisnis Digital"
+      ]
+    },
+    {
+      "nama": "Fakultas Teknik (FT)",
+      "prodi": [
+        "Teknik Sipil",
+        "Teknik Mesin",
+        "Teknik Elektro",
+        "Teknik Industri",
+        "Teknik Kimia",
+        "Teknik Informatika",
+        "Arsitektur"
+      ]
+    },
+    {
+      "nama": "Fakultas Hukum (FH)",
+      "prodi": [
+        "Ilmu Hukum",
+        "Hukum Internasional",
+        "Hukum Bisnis",
+        "Hukum Pidana",
+        "Hukum Tata Negara"
+      ]
+    },
+    {
+      "nama": "Fakultas Ilmu Sosial dan Ilmu Politik (FISIP)",
+      "prodi": [
+        "Hubungan Internasional",
+        "Ilmu Komunikasi",
+        "Sosiologi",
+        "Administrasi Publik",
+        "Ilmu Politik",
+        "Kriminologi"
+      ]
+    },
+    {
+      "nama": "Fakultas Seni Rupa dan Desain (FSRD)",
+      "prodi": [
+        "Desain Komunikasi Visual (DKV)",
+        "Desain Produk",
+        "Desain Interior",
+        "Seni Murni",
+        "Kriya",
+        "Film dan Televisi",
+        "Animasi"
+      ]
+    }
+  ]
+}

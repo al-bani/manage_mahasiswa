@@ -1,17 +1,52 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
-import 'package:manage_mahasiswa/core/validator/validator.dart';
-import 'package:manage_mahasiswa/features/Mahasiswa/domain/entities/mahasiswa_entity.dart';
 
+import 'package:manage_mahasiswa/core/validator/validator.dart';
+import 'package:manage_mahasiswa/features/Auth/presentation/widgets/components.dart';
+import 'package:manage_mahasiswa/features/Mahasiswa/data/models/study.dart';
+import 'package:manage_mahasiswa/features/Mahasiswa/domain/entities/mahasiswa_entity.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/presentation/bloc/mahasiswa_bloc.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/presentation/bloc/mahasiswa_event.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/presentation/bloc/mahasiswa_state.dart';
-import 'package:manage_mahasiswa/features/Mahasiswa/presentation/widgets/components.dart';
+import 'package:manage_mahasiswa/features/Mahasiswa/presentation/pages/create/step_one.dart';
+import 'package:manage_mahasiswa/features/Mahasiswa/presentation/pages/create/step_three.dart';
+import 'package:manage_mahasiswa/features/Mahasiswa/presentation/pages/create/step_two.dart';
+import 'package:manage_mahasiswa/features/Mahasiswa/presentation/widgets/components.dart' hide Txt;
+import 'package:manage_mahasiswa/features/Mahasiswa/presentation/widgets/indicator_step.dart';
 import 'package:manage_mahasiswa/injection_container.dart';
+import 'dart:io';
+import 'dart:math';
+import 'package:path/path.dart' as path;
+import 'dart:convert';
+import 'package:flutter/services.dart' show rootBundle;
 
-class CreateScreen extends StatelessWidget {
+class CreateScreen extends StatefulWidget {
   const CreateScreen({super.key});
+
+  @override
+  State<CreateScreen> createState() => _CreateScreenState();
+}
+
+class _CreateScreenState extends State<CreateScreen> {
+  int currentStep = 0;
+  final PageController _controller = PageController();
+
+  void nextStep() {
+    if (currentStep < 2) {
+      setState(() => currentStep++);
+      _controller.nextPage(
+          duration: const Duration(milliseconds: 300), curve: Curves.ease);
+    }
+  }
+
+  void previousStep() {
+    if (currentStep > 0) {
+      setState(() => currentStep--);
+      _controller.previousPage(
+          duration: const Duration(milliseconds: 300), curve: Curves.ease);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,158 +65,48 @@ class CreateScreen extends StatelessWidget {
               );
             }
           },
-          child: _appbody(context),
-        ),
-      ),
-    );
-  }
-
-  _appbody(BuildContext context) {
-    final TextEditingController firstNameController = TextEditingController();
-    final TextEditingController lastNameController = TextEditingController();
-    final TextEditingController emailController = TextEditingController();
-    final TextEditingController phoneController = TextEditingController();
-    final TextEditingController dateOfBirthController = TextEditingController();
-    final TextEditingController facultyController = TextEditingController();
-    final TextEditingController majorController = TextEditingController();
-    final TextEditingController residenceController = TextEditingController();
-    final ValueNotifier<String?> selectedValue = ValueNotifier<String?>(null);
-
-    final Map<String, dynamic> gender = {
-      "Man": const Icon(Icons.man),
-      "Woman": const Icon(Icons.woman),
-      "Mechanic": const Icon(Icons.miscellaneous_services_rounded),
-    };
-
-    return BlocBuilder<MahasiswaBloc, MahasiswaState>(
-      builder: (context, state) {
-        return SingleChildScrollView(
-          child: Container(
-            margin: const EdgeInsets.all(30),
+          child: SafeArea(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
-                  "Insert new Mahasiswa",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                const SizedBox(height: 24),
+                // 🔹 Step indicator di sini
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 30),
+                  child: StepIndicator(currentStep: currentStep, totalSteps: 3),
                 ),
-                const SizedBox(height: 30),
-                Row(
-                  children: [
-                    Expanded(
-                      child: NormalFiled(
-                        text: "First Name",
-                        controller: firstNameController,
-                      ),
+                const SizedBox(height: 24),
+
+                 Text(
+                    "Create Mahasiswa",
+                    style: AppTextStyles.openSansBold(
+                      fontSize: 20,
+                      color: AppColors.primary,
                     ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: NormalFiled(
-                        text: "Last Name",
-                        controller: lastNameController,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                NormalFiled(text: "Email", controller: emailController),
-                const SizedBox(height: 10),
-                NormalFiled(text: "Phone Number", controller: phoneController),
-                const SizedBox(height: 10),
-                NormalFiled(text: "Residence", controller: residenceController),
-                const SizedBox(height: 10),
-                NormalFiled(text: "Faculty", controller: facultyController),
-                const SizedBox(height: 10),
-                NormalFiled(text: "Major", controller: majorController),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    Expanded(
-                      child: ValueListenableBuilder<String?>(
-                        valueListenable: selectedValue,
-                        builder: (context, value, child) {
-                          return DropdownButton<String>(
-                            value: value,
-                            hint: const Text("Select your Gender"),
-                            items: gender.entries.map((entry) {
-                              return DropdownMenuItem<String>(
-                                value: entry.key,
-                                child: Row(
-                                  children: [
-                                    entry.value, // Ikon dari Map
-                                    const SizedBox(
-                                        width: 8), // Spasi antara ikon dan teks
-                                    Text(entry.key), // Teks dari Map
-                                  ],
-                                ),
-                              );
-                            }).toList(),
-                            onChanged: (newValue) {
-                              selectedValue.value = newValue;
-                            },
-                          );
-                        },
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: TextField(
-                        controller: dateOfBirthController,
-                        readOnly: true,
-                        decoration: const InputDecoration(
-                          prefixIcon: Icon(Icons.calendar_month_outlined),
-                          hintText: "Choose your birthday",
-                        ),
-                        onTap: () async {
-                          DateTime? pickedDate = await showDatePicker(
-                            context: context,
-                            initialDate: DateTime(2010),
-                            firstDate: DateTime(1900),
-                            lastDate: DateTime(2010),
-                          );
-                          if (pickedDate != null) {
-                            dateOfBirthController.text =
-                                "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
-                          }
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                state is RemoteMahasiswaLoading
-                    ? const CircularProgressIndicator()
-                    : ElevatedButton(
-                        onPressed: () {
-                          final dataMhs = (
-                            firstName: firstNameController.text,
-                            lastName: lastNameController.text,
-                            email: emailController.text,
-                            phone: phoneController.text,
-                            residence: residenceController.text,
-                            faculty: facultyController.text,
-                            major: majorController.text,
-                            dateOfBirth: dateOfBirthController.text,
-                            gender: selectedValue.value,
-                          );
-                          _onSubmitPressed(context, dataMhs);
-                        },
-                        child: const Text('Submit')),
-                const SizedBox(height: 20),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: InkWell(
-                    onTap: () => GoRouter.of(context).goNamed('home'),
-                    child: const Text('Back to Home'),
+                  ),
+                  const SizedBox(height: 30),
+                Expanded(
+                  child: PageView(
+                    controller: _controller,
+                    physics: const NeverScrollableScrollPhysics(),
+                    children: [
+                      StepOneForm(onNext: nextStep),
+                      StepTwoForm(onNext: nextStep, onBack: previousStep),
+                      StepThreeForm(onBack: previousStep),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
+  }
+
+  Future<StudyData> loadStudyData() async {
+    final jsonString = await rootBundle.loadString('assets/study.json');
+    final jsonMap = jsonDecode(jsonString);
+    return StudyData.fromJson(jsonMap);
   }
 
   void _dialogPopUp(String message, BuildContext context) {
@@ -212,11 +137,86 @@ class CreateScreen extends StatelessWidget {
     );
   }
 
+  // Fungsi untuk generate nama file random
+  String _generateRandomFileName(String originalPath) {
+    final extension = path.extension(originalPath);
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    final random = Random().nextInt(9999).toString().padLeft(4, '0');
+    return 'image_${timestamp}_$random$extension';
+  }
+
+  void _showImagePicker(BuildContext context,
+      ValueNotifier<File?> selectedImage, ImagePicker picker) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.photo_library),
+                title: const Text('Pilih dari Galeri'),
+                onTap: () async {
+                  Navigator.of(context).pop();
+                  final XFile? image = await picker.pickImage(
+                    source: ImageSource.gallery,
+                    maxWidth: 1024,
+                    maxHeight: 1024,
+                    imageQuality: 80,
+                  );
+                  if (image != null) {
+                    selectedImage.value = File(image.path);
+                  }
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.camera_alt),
+                title: const Text('Ambil Foto'),
+                onTap: () async {
+                  Navigator.of(context).pop();
+                  final XFile? image = await picker.pickImage(
+                    source: ImageSource.camera,
+                    maxWidth: 1024,
+                    maxHeight: 1024,
+                    imageQuality: 80,
+                  );
+                  if (image != null) {
+                    selectedImage.value = File(image.path);
+                  }
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   void _onSubmitPressed(BuildContext context, final dataMhs) {
     if (!emailCheck(dataMhs.email!)) {
       _dialogPopUp("Wrong Format Email", context);
       return;
     }
+
+    // Validasi field yang wajib diisi
+    if (dataMhs.firstName.isEmpty ||
+        dataMhs.lastName.isEmpty ||
+        dataMhs.email.isEmpty ||
+        dataMhs.phone.isEmpty ||
+        dataMhs.residence.isEmpty ||
+        dataMhs.faculty.isEmpty ||
+        dataMhs.major.isEmpty ||
+        dataMhs.dateOfBirth.isEmpty ||
+        dataMhs.gender == null) {
+      _dialogPopUp("Mohon lengkapi semua field yang wajib diisi", context);
+      return;
+    }
+
+    String imageFileName = dataMhs.image != null
+        ? _generateRandomFileName(dataMhs.image!.path)
+        : "default_image.jpg";
+
+    print("Generated filename: $imageFileName");
 
     final mahasiswaData = MahasiswaEntity(
         nim: 111,
@@ -228,7 +228,7 @@ class CreateScreen extends StatelessWidget {
         jurusan: dataMhs.major,
         dateOfBirth: dataMhs.dateOfBirth,
         gender: dataMhs.gender,
-        image: "images");
+        image: imageFileName);
 
     BlocProvider.of<MahasiswaBloc>(context)
         .add(CreateMahasiswaEvent(mahasiswaData));
