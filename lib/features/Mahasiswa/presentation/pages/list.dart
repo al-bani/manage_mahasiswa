@@ -2,13 +2,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:manage_mahasiswa/features/Auth/presentation/widgets/components.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/domain/entities/mahasiswa_entity.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/presentation/bloc/mahasiswa_bloc.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/presentation/bloc/mahasiswa_event.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/presentation/bloc/mahasiswa_state.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/presentation/widgets/bottom_bar.dart';
 import 'package:manage_mahasiswa/injection_container.dart';
-import 'package:manage_mahasiswa/features/Mahasiswa/presentation/pages/home_filter.dart';
+import 'package:manage_mahasiswa/features/Mahasiswa/presentation/widgets/filter_bottomsheet.dart';
 
 class HomeScreen extends StatefulWidget {
   final String search;
@@ -68,6 +69,9 @@ class _HomeScreenState extends State<HomeScreen> {
   };
   String selectedOrder = "A-Z (NIM)";
   bool orderSwitch = false;
+  bool _isClearing = false;
+  late TextEditingController _searchController;
+  String _currentHintText = "Search by Name and Nim";
 
   void setupScrollController() {
     scrollController.addListener(() {
@@ -102,6 +106,31 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     bloc = containerInjection<MahasiswaBloc>();
+    _searchController = TextEditingController(text: widget.search);
+
+    // Set initial hint text
+    _currentHintText =
+        widget.search.isNotEmpty ? widget.search : "Search by Name and Nim";
+
+    // Add listener for search functionality
+    _searchController.addListener(() {
+      if (_isClearing) return; // Skip listener when clearing programmatically
+
+      final text = _searchController.text.trim();
+      if (text.isEmpty && searchMode) {
+        setSearchMode(false);
+        setState(() {
+          _currentHintText = "Search by Name and Nim";
+        });
+        bloc.add(GetAllMahasiswaEvent(true));
+      } else if (text.isNotEmpty && !searchMode) {
+        setSearchMode(true);
+        bloc.add(SearchMahasiswaEvent(text));
+      } else if (text.isNotEmpty && searchMode) {
+        bloc.add(SearchMahasiswaEvent(text));
+      }
+    });
+
     if (widget.search.isNotEmpty) {
       searchMode = true;
       bloc.add(SearchMahasiswaEvent(widget.search));
@@ -114,6 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void dispose() {
     scrollController.dispose();
+    _searchController.dispose();
     bloc.close();
     super.dispose();
   }
@@ -122,6 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: const BottomNavBar(currentIndex: 0),
+      backgroundColor: AppColors.white,
       body: BlocProvider.value(
         value: bloc,
         child: BlocBuilder<MahasiswaBloc, MahasiswaState>(
@@ -136,10 +167,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _bodyApp(ScrollController scrollController, MahasiswaState state,
       context, bool searchMode, bloc, Function(bool) setSearchMode) {
-    TextEditingController searchController = TextEditingController();
-
     return Container(
-      margin: const EdgeInsets.all(20),
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
       child: Column(
         children: [
           Row(
@@ -147,30 +176,60 @@ class _HomeScreenState extends State<HomeScreen> {
               IconButton(
                 onPressed: () => _showFilter(context),
                 icon: Icon(
-                  Icons.filter_list_outlined,
-                  color: filterMode ? Colors.blue : null,
+                  Icons.filter_list,
+                  color: filterMode ? AppColors.secondary : AppColors.primary,
+                  size: 24,
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 4),
               Expanded(
                 child: SizedBox(
                   height: 40,
                   child: SearchBar(
-                    onTap: () => GoRouter.of(context).goNamed('search'),
-                    controller: searchController,
+                    onTap: searchMode
+                        ? null
+                        : () => GoRouter.of(context).goNamed('search'),
+                    controller: _searchController,
                     elevation: WidgetStateProperty.all(0),
+                    backgroundColor: WidgetStateProperty.all(AppColors.white),
+                    hintText: _currentHintText,
+                    hintStyle: WidgetStateProperty.all(
+                      AppTextStyles.openSansItalic(fontSize: 14),
+                    ),
+                    // Mengatur border radius dan border line
+                    shape: WidgetStateProperty.all(
+                      RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(12), // Border radius
+                      ),
+                    ),
+
+                    side: WidgetStateProperty.all(
+                      const BorderSide(
+                        color: AppColors.primary, // Warna border
+                        width: 1.0, // Ketebalan border
+                      ),
+                    ),
+
                     trailing: <Widget>[
                       if (searchMode)
                         IconButton(
                           icon: const Icon(Icons.close),
                           onPressed: () {
-                            bloc.add(GetAllMahasiswaEvent(true));
+                            _isClearing = true;
+                            _searchController.clear();
                             setSearchMode(false);
+                            setState(() {
+                              _currentHintText = "Search by Name and Nim";
+                            });
+                            bloc.add(GetAllMahasiswaEvent(true));
+                            _isClearing = false;
                           },
                         )
                       else
                         IconButton(
                           icon: const Icon(Icons.search),
+                          color: AppColors.primary,
                           onPressed: () =>
                               GoRouter.of(context).goNamed('search'),
                         ),
@@ -178,10 +237,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 4),
               IconButton(
                 onPressed: () => GoRouter.of(context).goNamed('create'),
                 icon: const Icon(Icons.add),
+                color: AppColors.primary,
               ),
             ],
           ),

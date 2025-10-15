@@ -59,7 +59,7 @@ Widget _appbody(BuildContext context, int nimMhs) {
         return Center(child: Text("Error: ${state.error!["msg"]}"));
       } else if (state is RemoteMahasiswaDone) {
         MahasiswaEntity mhs = state.mahasiswa;
-        DateTime parsed = DateTime.parse(mhs.dateOfBirth!);
+        DateTime parsed = DateTime.parse(mhs.birth!);
 
         String formattedDate =
             "${parsed.year}-${parsed.month.toString().padLeft(2, '0')}-${parsed.day.toString().padLeft(2, '0')}";
@@ -77,7 +77,7 @@ Widget _appbody(BuildContext context, int nimMhs) {
         final TextEditingController majorController =
             TextEditingController(text: mhs.jurusan);
         final TextEditingController residenceController =
-            TextEditingController(text: mhs.asal);
+            TextEditingController(text: mhs.city);
 
         var genderOrigin = "Mechanic";
 
@@ -250,12 +250,12 @@ void _onSubmitPressed(BuildContext context, final dataMhs) {
   final mahasiswaData = MahasiswaEntity(
       nim: dataMhs.nim,
       name: dataMhs.name,
-      asal: dataMhs.residence,
+      city: dataMhs.residence,
       email: dataMhs.email,
       phoneNumber: dataMhs.phone,
       fakultas: dataMhs.faculty,
       jurusan: dataMhs.major,
-      dateOfBirth: dataMhs.dateOfBirth,
+      birth: dataMhs.dateOfBirth,
       gender: dataMhs.gender,
       image: "images");
 

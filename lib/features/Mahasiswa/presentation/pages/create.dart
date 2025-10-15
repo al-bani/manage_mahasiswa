@@ -1,25 +1,59 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:manage_mahasiswa/core/validator/validator.dart';
 import 'package:manage_mahasiswa/features/Auth/presentation/widgets/components.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/data/models/study.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/domain/entities/mahasiswa_entity.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/presentation/bloc/mahasiswa_bloc.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/presentation/bloc/mahasiswa_event.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/presentation/bloc/mahasiswa_state.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/presentation/pages/create/step_one.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/presentation/pages/create/step_three.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/presentation/pages/create/step_two.dart';
-import 'package:manage_mahasiswa/features/Mahasiswa/presentation/widgets/components.dart' hide Txt;
 import 'package:manage_mahasiswa/features/Mahasiswa/presentation/widgets/indicator_step.dart';
+import 'package:manage_mahasiswa/features/Mahasiswa/presentation/widgets/popup.dart';
 import 'package:manage_mahasiswa/injection_container.dart';
 import 'dart:io';
 import 'dart:math';
 import 'package:path/path.dart' as path;
 import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
+
+// FormDataModel untuk centralized state management - kompatibel dengan MahasiswaEntity
+class FormDataModel {
+  // Step 1 Data
+  File? image;
+  String firstName = '';
+  String lastName = '';
+  String username = '';
+
+  // Step 2 Data
+  String email = '';
+  String phone = '';
+  String? selectedCountry;
+  DateTime? birth;
+  String? gender;
+
+  String province = '';
+  String city = '';
+  String district = '';
+  String subdistrict = '';
+  String faculty = '';
+  String major = '';
+
+  String get formattedBirth {
+    if (birth == null) return '';
+    return '${birth!.day.toString().padLeft(2, '0')}/${birth!.month.toString().padLeft(2, '0')}/${birth!.year}';
+  }
+
+  // Helper method untuk mendapatkan full name
+  String get fullName => '$firstName $lastName';
+
+  // Helper method untuk mendapatkan full address
+  String get fullAddress => '$province, $city, $district, $subdistrict';
+}
 
 class CreateScreen extends StatefulWidget {
   const CreateScreen({super.key});
@@ -31,6 +65,9 @@ class CreateScreen extends StatefulWidget {
 class _CreateScreenState extends State<CreateScreen> {
   int currentStep = 0;
   final PageController _controller = PageController();
+
+  // Centralized form data
+  final FormDataModel formData = FormDataModel();
 
   void nextStep() {
     if (currentStep < 2) {
@@ -48,35 +85,95 @@ class _CreateScreenState extends State<CreateScreen> {
     }
   }
 
+  // Callbacks untuk update data dari setiap step
+  void updateStepOneData({
+    File? image,
+    String? firstName,
+    String? lastName,
+    String? username,
+  }) {
+    setState(() {
+      if (image != null) formData.image = image;
+      if (firstName != null) formData.firstName = firstName;
+      if (lastName != null) formData.lastName = lastName;
+      if (username != null) formData.username = username;
+    });
+  }
+
+  void updateStepTwoData({
+    String? email,
+    String? phone,
+    String? selectedCountry,
+    DateTime? birth,
+    String? gender,
+  }) {
+    setState(() {
+      if (email != null) formData.email = email;
+      if (phone != null) formData.phone = phone;
+      if (selectedCountry != null) formData.selectedCountry = selectedCountry;
+      if (birth != null) formData.birth = birth;
+      if (gender != null) formData.gender = gender;
+    });
+  }
+
+  void updateStepThreeData({
+    String? province,
+    String? city,
+    String? district,
+    String? subdistrict,
+    String? faculty,
+    String? major,
+  }) {
+    setState(() {
+      if (province != null) formData.province = province;
+      if (city != null) formData.city = city;
+      if (district != null) formData.district = district;
+      if (subdistrict != null) formData.subdistrict = subdistrict;
+      if (faculty != null) formData.faculty = faculty;
+      if (major != null) formData.major = major;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.white,
       body: BlocProvider(
         create: (context) => containerInjection<MahasiswaBloc>(),
         child: BlocListener<MahasiswaBloc, MahasiswaState>(
           listener: (context, state) {
             if (state is RemoteMahasiswaCreate) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Data Created!')),
+              PopupWidget.showOkOnly(
+                context: context,
+                title: "Successfully",
+                message: "Data Mahasiswa ${state.mhs?.name} has been created",
+                onOkPressed: () => GoRouter.of(context).goNamed('home'),
+                okButtonColor: Colors.greenAccent,
               );
             } else if (state is RemoteMahasiswaError) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Error While Create Data')),
+              PopupWidget.showOkOnly(
+                context: context,
+                title: "Failed",
+                message: "Data Mahasiswa ${state.mhs?.name} Failed to create",
+                onOkPressed: () => GoRouter.of(context).goNamed('home'),
+                okButtonColor: Colors.redAccent,
               );
             }
           },
-          child: SafeArea(
-            child: Column(
-              children: [
-                const SizedBox(height: 24),
-                // 🔹 Step indicator di sini
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30),
-                  child: StepIndicator(currentStep: currentStep, totalSteps: 3),
-                ),
-                const SizedBox(height: 24),
+          child: Builder(
+            builder: (context) => SafeArea(
+              child: Column(
+                children: [
+                  const SizedBox(height: 24),
+                  // 🔹 Step indicator di sini
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                    child:
+                        StepIndicator(currentStep: currentStep, totalSteps: 3),
+                  ),
+                  const SizedBox(height: 24),
 
-                 Text(
+                  Text(
                     "Create Mahasiswa",
                     style: AppTextStyles.openSansBold(
                       fontSize: 20,
@@ -84,18 +181,33 @@ class _CreateScreenState extends State<CreateScreen> {
                     ),
                   ),
                   const SizedBox(height: 30),
-                Expanded(
-                  child: PageView(
-                    controller: _controller,
-                    physics: const NeverScrollableScrollPhysics(),
-                    children: [
-                      StepOneForm(onNext: nextStep),
-                      StepTwoForm(onNext: nextStep, onBack: previousStep),
-                      StepThreeForm(onBack: previousStep),
-                    ],
+                  Expanded(
+                    child: PageView(
+                      controller: _controller,
+                      physics: const NeverScrollableScrollPhysics(),
+                      children: [
+                        StepOneForm(
+                          onNext: nextStep,
+                          formData: formData,
+                          onDataUpdate: updateStepOneData,
+                        ),
+                        StepTwoForm(
+                          onNext: nextStep,
+                          onBack: previousStep,
+                          formData: formData,
+                          onDataUpdate: updateStepTwoData,
+                        ),
+                        StepThreeForm(
+                          onBack: previousStep,
+                          onSubmit: () => _onSubmitPressed(context, formData),
+                          formData: formData,
+                          onDataUpdate: updateStepThreeData,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -109,34 +221,6 @@ class _CreateScreenState extends State<CreateScreen> {
     return StudyData.fromJson(jsonMap);
   }
 
-  void _dialogPopUp(String message, BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) => AlertDialog(
-        title: const Txt(
-          value: "Information",
-          size: 18,
-          align: TextAlign.left,
-        ),
-        content: Txt(
-          value: message,
-          size: 14,
-          align: TextAlign.left,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, 'OK'),
-            child: const Txt(
-              value: "OK",
-              size: 16,
-              align: TextAlign.center,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   // Fungsi untuk generate nama file random
   String _generateRandomFileName(String originalPath) {
     final extension = path.extension(originalPath);
@@ -145,89 +229,56 @@ class _CreateScreenState extends State<CreateScreen> {
     return 'image_${timestamp}_$random$extension';
   }
 
-  void _showImagePicker(BuildContext context,
-      ValueNotifier<File?> selectedImage, ImagePicker picker) {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return SafeArea(
-          child: Wrap(
-            children: [
-              ListTile(
-                leading: const Icon(Icons.photo_library),
-                title: const Text('Pilih dari Galeri'),
-                onTap: () async {
-                  Navigator.of(context).pop();
-                  final XFile? image = await picker.pickImage(
-                    source: ImageSource.gallery,
-                    maxWidth: 1024,
-                    maxHeight: 1024,
-                    imageQuality: 80,
-                  );
-                  if (image != null) {
-                    selectedImage.value = File(image.path);
-                  }
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.camera_alt),
-                title: const Text('Ambil Foto'),
-                onTap: () async {
-                  Navigator.of(context).pop();
-                  final XFile? image = await picker.pickImage(
-                    source: ImageSource.camera,
-                    maxWidth: 1024,
-                    maxHeight: 1024,
-                    imageQuality: 80,
-                  );
-                  if (image != null) {
-                    selectedImage.value = File(image.path);
-                  }
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  void _onSubmitPressed(BuildContext context, final dataMhs) {
-    if (!emailCheck(dataMhs.email!)) {
-      _dialogPopUp("Wrong Format Email", context);
+  void _onSubmitPressed(BuildContext context, FormDataModel formData) {
+    if (!emailCheck(formData.email)) {
+      PopupWidget.showOkOnly(
+          context: context,
+          title: "Information",
+          message: "Wrong Email Format",
+          okButtonColor: Colors.redAccent);
       return;
     }
 
     // Validasi field yang wajib diisi
-    if (dataMhs.firstName.isEmpty ||
-        dataMhs.lastName.isEmpty ||
-        dataMhs.email.isEmpty ||
-        dataMhs.phone.isEmpty ||
-        dataMhs.residence.isEmpty ||
-        dataMhs.faculty.isEmpty ||
-        dataMhs.major.isEmpty ||
-        dataMhs.dateOfBirth.isEmpty ||
-        dataMhs.gender == null) {
-      _dialogPopUp("Mohon lengkapi semua field yang wajib diisi", context);
+    if (formData.firstName.isEmpty ||
+        formData.lastName.isEmpty ||
+        formData.email.isEmpty ||
+        formData.phone.isEmpty ||
+        formData.province.isEmpty ||
+        formData.city.isEmpty ||
+        formData.district.isEmpty ||
+        formData.subdistrict.isEmpty ||
+        formData.faculty.isEmpty ||
+        formData.major.isEmpty ||
+        formData.birth == null ||
+        formData.gender == null) {
+      PopupWidget.showOkOnly(
+          context: context,
+          title: "Information",
+          message: "Please fill in all required fields",
+          okButtonColor: Colors.redAccent);
       return;
     }
 
-    String imageFileName = dataMhs.image != null
-        ? _generateRandomFileName(dataMhs.image!.path)
+    String imageFileName = formData.image != null
+        ? _generateRandomFileName(formData.image!.path)
         : "default_image.jpg";
 
     print("Generated filename: $imageFileName");
 
     final mahasiswaData = MahasiswaEntity(
         nim: 111,
-        name: dataMhs.firstName + " " + dataMhs.lastName,
-        asal: dataMhs.residence,
-        email: dataMhs.email,
-        phoneNumber: dataMhs.phone,
-        fakultas: dataMhs.faculty,
-        jurusan: dataMhs.major,
-        dateOfBirth: dataMhs.dateOfBirth,
-        gender: dataMhs.gender,
+        name: formData.fullName,
+        province: formData.province,
+        city: formData.city,
+        district: formData.district,
+        subdistrict: formData.subdistrict,
+        email: formData.email,
+        phoneNumber: formData.phone,
+        fakultas: formData.faculty,
+        jurusan: formData.major,
+        birth: formData.birth.toString(),
+        gender: formData.gender,
         image: imageFileName);
 
     BlocProvider.of<MahasiswaBloc>(context)

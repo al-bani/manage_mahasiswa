@@ -4,12 +4,15 @@ class MahasiswaModel extends MahasiswaEntity {
   const MahasiswaModel({
     super.nim,
     super.name,
-    super.asal,
+    super.province,
+    super.city,
+    super.district,
+    super.subdistrict,
     super.email,
     super.phoneNumber,
     super.fakultas,
     super.jurusan,
-    super.dateOfBirth,
+    super.birth,
     super.gender,
     super.image,
   });
@@ -18,12 +21,15 @@ class MahasiswaModel extends MahasiswaEntity {
     return MahasiswaModel(
       nim: data['nim'] as int?,
       name: data['name'] as String?,
-      asal: data['asal'] as String?,
+      province: data['province'] as String?,
+      city: data['city'] as String?,
+      district: data['district'] as String?,
+      subdistrict: data['Subdistrict'] as String?,
       email: data['email'] as String?,
       phoneNumber: data['phone_number'] as String?,
       fakultas: data['fakultas'] as String?,
       jurusan: data['jurusan'] as String?,
-      dateOfBirth: data['date_of_birth'] as String?,
+      birth: data['date_of_birth'] as String?,
       gender: data['gender'] as String?,
       image: data['image'] as String?,
     );
@@ -33,12 +39,15 @@ class MahasiswaModel extends MahasiswaEntity {
     return {
       'nim': nim,
       'name': name,
-      'asal': asal,
+      'province': province,
+      'city': city,
+      'district': district,
+      'subdistrict': subdistrict,
       'email': email,
       'phone_number': phoneNumber,
       'fakultas': fakultas,
       'jurusan': jurusan,
-      'date_of_birth': dateOfBirth,
+      'birth': birth,
       'gender': gender,
       'image': image
     };

@@ -89,12 +89,15 @@ class MahasiswaApiServiceImpl extends MahasiswaApiService {
     Map<String, dynamic> queryParams = {
       "admin_id": adminId,
       "name": mhs.name!,
-      "asal": mhs.asal!,
+      "province": mhs.province!,
+      "city": mhs.city!,
+      "district": mhs.district!,
+      "subdistrict": mhs.subdistrict!,
       "email": mhs.email!,
       "phone_number": mhs.phoneNumber!,
       "fakultas": mhs.fakultas!,
       "jurusan": mhs.jurusan!,
-      "date_of_birth": mhs.dateOfBirth!,
+      "date_of_birth": mhs.birth!,
       "gender": mhs.gender!,
       "image": mhs.image!
     };
@@ -116,12 +119,15 @@ class MahasiswaApiServiceImpl extends MahasiswaApiService {
     Map<String, dynamic> queryParams = {
       "admin_id": adminId,
       "name": mhs.name!,
-      "asal": mhs.asal!,
+      "province": mhs.province!,
+      "city": mhs.city!,
+      "district": mhs.district!,
+      "subdistrict": mhs.subdistrict!,
       "email": mhs.email!,
       "phone_number": mhs.phoneNumber!,
       "fakultas": mhs.fakultas!,
       "jurusan": mhs.jurusan!,
-      "date_of_birth": mhs.dateOfBirth!,
+      "birth": mhs.birth!,
       "gender": mhs.gender!,
       "image": mhs.image!
     };

@@ -6,12 +6,27 @@ import 'package:manage_mahasiswa/features/Mahasiswa/presentation/widgets/button.
 import 'package:manage_mahasiswa/features/Mahasiswa/presentation/widgets/text_field.dart';
 import 'dart:convert';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../create.dart'; // Import FormDataModel
 
 class StepTwoForm extends StatefulWidget {
   final VoidCallback onNext;
   final VoidCallback onBack;
+  final FormDataModel formData;
+  final Function({
+    String? email,
+    String? phone,
+    String? selectedCountry,
+    DateTime? birth,
+    String? gender,
+  }) onDataUpdate;
 
-  const StepTwoForm({super.key, required this.onNext, required this.onBack});
+  const StepTwoForm({
+    super.key,
+    required this.onNext,
+    required this.onBack,
+    required this.formData,
+    required this.onDataUpdate,
+  });
 
   @override
   State<StepTwoForm> createState() => _StepTwoFormState();
@@ -32,7 +47,41 @@ class _StepTwoFormState extends State<StepTwoForm> {
   @override
   void initState() {
     super.initState();
+    // Load existing data
+    emailController.text = widget.formData.email;
+    phoneController.text = widget.formData.phone;
+    selectedDate = widget.formData.birth;
+    selectedGender = widget.formData.gender;
+
+    if (selectedDate != null) {
+      dateController.text = DateFormat('dd/MM/yyyy').format(selectedDate!);
+    }
+
     _loadTelephoneCodes();
+  }
+
+  void _onNext() {
+    // Update data before moving to next step
+    widget.onDataUpdate(
+      email: emailController.text,
+      phone: phoneController.text,
+      selectedCountry: selectedCountry?['code'],
+      birth: selectedDate,
+      gender: selectedGender,
+    );
+    widget.onNext();
+  }
+
+  void _onBack() {
+    // Update data before going back
+    widget.onDataUpdate(
+      email: emailController.text,
+      phone: phoneController.text,
+      selectedCountry: selectedCountry?['code'],
+      birth: selectedDate,
+      gender: selectedGender,
+    );
+    widget.onBack();
   }
 
   Future<void> _loadTelephoneCodes() async {
@@ -66,6 +115,7 @@ class _StepTwoFormState extends State<StepTwoForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.white,
       body: SafeArea(
         child: Column(
           children: [
@@ -207,7 +257,6 @@ class _StepTwoFormState extends State<StepTwoForm> {
                       ],
                     ),
                     // Extra padding at bottom to ensure content doesn't get hidden behind buttons
-                    const SizedBox(height: 100),
                   ],
                 ),
               ),
@@ -224,9 +273,7 @@ class _StepTwoFormState extends State<StepTwoForm> {
                     Expanded(
                       flex: 2, // Button Back mendapat 2/5 dari lebar
                       child: ButtonForm(
-                        onPressed: () {
-                          widget.onBack();
-                        },
+                        onPressed: _onBack, // Use the new method
                         text: "Back",
                         backgroundColor: AppColors.secondary,
                         textColor: AppColors.primary,
@@ -237,9 +284,7 @@ class _StepTwoFormState extends State<StepTwoForm> {
                       flex:
                           4, // Button Next mendapat 4/5 dari lebar (lebih lebar)
                       child: ButtonForm(
-                        onPressed: () {
-                          widget.onNext();
-                        },
+                        onPressed: _onNext, // Use the new method
                         text: "Next",
                         backgroundColor: AppColors.primary,
                         textColor: AppColors.secondary,
@@ -280,7 +325,7 @@ class _StepTwoFormState extends State<StepTwoForm> {
                     height: 4,
                     margin: const EdgeInsets.only(bottom: 20),
                     decoration: BoxDecoration(
-                      color: AppColors.white,
+                      color: AppColors.primary,
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),

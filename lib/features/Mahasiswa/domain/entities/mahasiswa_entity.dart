@@ -3,24 +3,30 @@ import 'package:equatable/equatable.dart';
 class MahasiswaEntity extends Equatable {
   final int? nim;
   final String? name;
-  final String? asal;
+  final String? province;
+  final String? city;
+  final String? district;
+  final String? subdistrict;
   final String? email;
   final String? phoneNumber;
   final String? fakultas;
   final String? jurusan;
-  final String? dateOfBirth;
+  final String? birth;
   final String? gender;
   final String? image;
 
   const MahasiswaEntity({
     this.nim,
     this.name,
-    this.asal,
+    this.province,
+    this.city,
+    this.district,
+    this.subdistrict,
     this.email,
     this.phoneNumber,
     this.fakultas,
     this.jurusan,
-    this.dateOfBirth,
+    this.birth,
     this.gender,
     this.image,
   });
@@ -30,12 +36,15 @@ class MahasiswaEntity extends Equatable {
     return [
       nim,
       name,
-      asal,
+      province,
+      city,
+      district,
+      subdistrict,
       email,
       phoneNumber,
       fakultas,
       jurusan,
-      dateOfBirth,
+      birth,
       gender,
       image,
     ];

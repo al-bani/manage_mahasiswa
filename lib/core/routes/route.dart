@@ -5,7 +5,7 @@ import 'package:manage_mahasiswa/features/Auth/presentation/pages/verification.d
 import 'package:manage_mahasiswa/features/Mahasiswa/presentation/pages/create.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/presentation/pages/dashboard.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/presentation/pages/detail.dart';
-import 'package:manage_mahasiswa/features/Mahasiswa/presentation/pages/home.dart';
+import 'package:manage_mahasiswa/features/Mahasiswa/presentation/pages/list.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/presentation/pages/search.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/presentation/pages/update.dart';
 

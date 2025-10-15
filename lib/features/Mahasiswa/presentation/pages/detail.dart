@@ -40,7 +40,7 @@ Widget _bodyApp() {
 
         String gender = mhs.gender == 'L' ? "Pria" : "Perempuan";
 
-        DateTime dateTime = DateTime.parse(mhs.dateOfBirth!);
+        DateTime dateTime = DateTime.parse(mhs.birth!);
         String birthDate = DateFormat('d MMMM y', 'id_ID').format(dateTime);
 
         return BlocListener<MahasiswaBloc, MahasiswaState>(
@@ -90,7 +90,7 @@ Widget _bodyApp() {
                     align: TextAlign.left),
                 const SizedBox(height: 5),
                 Txt(
-                    value: "Asal : ${mhs.asal}",
+                    value: "Asal : ${mhs.city}",
                     size: 12,
                     align: TextAlign.left),
                 const SizedBox(height: 5),

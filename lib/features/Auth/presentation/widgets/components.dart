@@ -51,6 +51,7 @@ class AppColors {
   static const Color secondary = Color(0xFFFD8B51);
   static const Color white = Color(0xffffffff);
   static const Color grey = Color(0xFFEFEFEF);
+  static const Color silver = Color(0xFFD9D9D9);
 }
 
 class AppTextField extends StatelessWidget {

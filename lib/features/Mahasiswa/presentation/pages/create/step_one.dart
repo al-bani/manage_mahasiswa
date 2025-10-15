@@ -1,14 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:manage_mahasiswa/features/Auth/presentation/widgets/components.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/presentation/widgets/button.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/presentation/widgets/text_field.dart';
+import '../create.dart'; // Import FormDataModel
 
 class StepOneForm extends StatefulWidget {
   final VoidCallback onNext;
+  final FormDataModel formData;
+  final Function({
+    File? image,
+    String? firstName,
+    String? lastName,
+    String? username,
+  }) onDataUpdate;
 
-  const StepOneForm({super.key, required this.onNext});
+  const StepOneForm({
+    super.key,
+    required this.onNext,
+    required this.formData,
+    required this.onDataUpdate,
+  });
 
   @override
   State<StepOneForm> createState() => _StepOneFormState();
@@ -20,6 +34,27 @@ class _StepOneFormState extends State<StepOneForm> {
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
   final TextEditingController usernameController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    // Load existing data
+    selectedImage.value = widget.formData.image;
+    firstNameController.text = widget.formData.firstName;
+    lastNameController.text = widget.formData.lastName;
+    usernameController.text = widget.formData.username;
+  }
+
+  void _onNext() {
+    // Update data before moving to next step
+    widget.onDataUpdate(
+      image: selectedImage.value,
+      firstName: firstNameController.text,
+      lastName: lastNameController.text,
+      username: usernameController.text,
+    );
+    widget.onNext();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -280,9 +315,7 @@ class _StepOneFormState extends State<StepOneForm> {
                 Expanded(
                   flex: 2, // Button Back mendapat 2/5 dari lebar
                   child: ButtonForm(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
+                    onPressed: () => GoRouter.of(context).goNamed('home'),
                     text: "Back",
                     backgroundColor: AppColors.secondary,
                     textColor: AppColors.primary,
@@ -292,9 +325,7 @@ class _StepOneFormState extends State<StepOneForm> {
                 Expanded(
                   flex: 4, // Button Next mendapat 3/5 dari lebar (lebih lebar)
                   child: ButtonForm(
-                    onPressed: () {
-                      widget.onNext();
-                    },
+                    onPressed: _onNext, // Use the new method
                     text: "Next",
                     backgroundColor: AppColors.primary,
                     textColor: AppColors.secondary,

@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
 import 'package:manage_mahasiswa/core/resources/data_local.dart';
 import 'package:manage_mahasiswa/core/routes/route.dart';
+import 'package:manage_mahasiswa/features/Auth/presentation/widgets/components.dart';
 import 'package:manage_mahasiswa/features/Mahasiswa/presentation/pages/test.dart';
 import 'package:manage_mahasiswa/injection_container.dart';
 import 'package:manage_mahasiswa/observer.dart';
@@ -43,6 +44,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: AppColors.white),
+      ),
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,

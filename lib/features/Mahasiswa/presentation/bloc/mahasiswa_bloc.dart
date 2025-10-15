@@ -137,6 +137,8 @@ class MahasiswaBloc extends Bloc<MahasiswaEvent, MahasiswaState> {
     final dataState = await _createMahasiswaUseCase.execute(
         event.mhs, data!.token!, data.id!);
 
+    print(dataState);
+
     if (dataState is DataSuccess) {
       emit(RemoteMahasiswaCreate(event.mhs));
     } else if (dataState is DataFailed) {
